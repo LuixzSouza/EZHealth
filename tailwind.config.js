@@ -11,6 +11,9 @@ module.exports = {
         DarkBlue: '#002157',
         orange: '#F47127',
         gray: '#EBEDEF'
+      },
+      height: {
+        580: '36.25rem'
       }
     },
   },
