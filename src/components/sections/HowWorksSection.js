@@ -1,12 +1,10 @@
-import { CircleOrangeIcon } from "../CircleOrangeIcon";
 import { ContainerGrid } from "../ContainerGrid";
 import { HeadingOrange } from "../HeadingOrange";
 import { ListFunctions } from "../ListFunctions";
-import { ParagraphBlue } from "../ParagraphBlue";
 
 export function HowWorksSection() {
     return(
-        <section className="py-14" >
+        <section className="py-14" id="scomofunciona" >
             <ContainerGrid>
                 <HeadingOrange text="Como funciona o EZHealth?" />
                 <div className="flex flex-col gap-8 mt-10" >

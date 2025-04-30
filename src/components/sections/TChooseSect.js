@@ -5,7 +5,7 @@ import { ParagraphBlue } from "../ParagraphBlue";
 export function TChooseSect() {
     return(
         <section>
-            <ContainerGrid className="flex items-center justify-around" >
+            <ContainerGrid className="flex items-center justify-around w-full h-screen" >
                 <div className="flex flex-col items-center justify-center text-center max-w-96" >
                     <CircleOrangeIcon img={"/icons/relatorio-de-saude.svg"}/>
                     <div>

@@ -5,8 +5,8 @@ import { ParagraphBlue } from "../ParagraphBlue";
 
 export function WhatIsSection() {
     return(
-        <section className="py-14" >
-            <ContainerGrid className="flex items-center justify-between" >
+        <section className="py-14" id="swhatis" >
+            <ContainerGrid className="flex flex-col items-center justify-between lg:flex-row" >
                 <div className="w-full max-w-2xl flex flex-col gap-7" >
                     <HeadingOrange text="O que é EZHealth?" />
                     <ParagraphBlue>
