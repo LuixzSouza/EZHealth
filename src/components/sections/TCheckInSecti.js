@@ -5,7 +5,7 @@ import { ParagraphBlue } from "../ParagraphBlue";
 export function TCheckInSecti() {
     return(
         <section>
-            <ContainerGrid className="flex flex-col items-center justify-center gap-6 h-screen" >
+            <ContainerGrid className="flex flex-col items-center justify-center gap-6 h-screen text-center" >
                 <HeadingOrange text="CHECK - IN"/>
                 <ParagraphBlue>Para começar, informe seu <span className="font-bold" >Nome, CPF e Número do convênio.</span> Assim, garantimos um atendimento ágil e sem burocracia.</ParagraphBlue>
                 <div className="flex flex-col" >

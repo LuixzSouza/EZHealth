@@ -6,12 +6,14 @@ import { TCheckInSecti } from "@/components/sections/TCheckInSecti";
 import { TChooseSect } from "@/components/sections/TChooseSect";
 import { TConfirmed } from "@/components/sections/TConfirmed";
 import { TriagemHomeSect } from "@/components/sections/TriagemHomeSect";
+import { TSymptomsForm } from "@/components/sections/TSymptomsForm";
 
 export default function TFormulario() {
   const steps = [
     { title: 'Boas-vindas', component: <TriagemHomeSect /> },
     { title: 'Escolha', component: <TChooseSect /> },
     { title: 'Check-in', component: <TCheckInSecti /> },
+    { title: 'Formulario', component: <TSymptomsForm /> },
     { title: 'Confirmação', component: <TConfirmed /> },
   ];
 
@@ -32,7 +34,7 @@ export default function TFormulario() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex items-center justify-center flex-col min-h-screen">
       <Header />
       <div className="flex-grow">
         <div className="min-h-screen">
