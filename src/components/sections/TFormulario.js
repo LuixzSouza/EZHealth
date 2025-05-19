@@ -12,6 +12,7 @@ import { UrgentReceived } from '@/components/UrgentReceived';
 export default function TFormulario() {
   const steps = [
     { title: 'Boas-vindas', component: <TriagemHomeSect /> },
+    { title: 'Escolha', component: <TChooseSect /> },
     { title: 'Check-in', component: <TCheckInSecti /> },
     { title: 'Formulario', component: <TSymptomsForm /> },
     { title: 'Confirmação', component: <TConfirmed /> },

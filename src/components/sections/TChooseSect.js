@@ -15,7 +15,7 @@ export function TChooseSect({ onStart, onUrgent }) {
                         INICIAR TRIAGEM
                         </h4>
                         <ParagraphBlue>
-                        Responda algumas perguntas rápidas e seja direcionado ao especialista certo de forma ágil e eficiente.
+                        Responda perguntas rápidas para identificar os sintomas e receba o encaminhamento ideal, de forma ágil e eficiente.
                         </ParagraphBlue>
                     </div>
                 </div>
@@ -29,7 +29,7 @@ export function TChooseSect({ onStart, onUrgent }) {
                         PRECISO DE AJUDA
                         </h4>
                         <ParagraphBlue>
-                        Solicite ajuda imediata! Esta opção é para pacientes que não conseguem realizar a triagem sozinhos e precisam de atendimento prioritário.
+                        Solicite ajuda prioritária. Essa opção é para pacientes que não conseguem realizar a triagem sozinhos e precisam de suporte imediato.
                         </ParagraphBlue>
                     </div>
                 </div>

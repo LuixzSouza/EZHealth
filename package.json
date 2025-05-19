@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "framer-motion": "^12.12.1",
+    "gsap": "^3.13.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.3",
     "next": "15.2.4",
