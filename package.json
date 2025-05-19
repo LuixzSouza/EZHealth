@@ -10,6 +10,8 @@
     "tailwind:init": "npx tailwindcss init -p"
   },
   "dependencies": {
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.14.3",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
