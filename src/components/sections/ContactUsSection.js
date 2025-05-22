@@ -56,7 +56,7 @@ export function ContactUsSection() {
                 </ParagraphBlue>
                 <div className="flex items-center justify-center gap-5">
                     <Image src={"/icons/whatsapp.svg"} alt="Icon Zap" width={45} height={45} />
-                    <span className="text-DarkBlue text-3xl font-semibold">(35) 92569-1149</span>
+                    <span className="text-DarkBlue text-3xl font-semibold">+55 (35) 98569-2364</span>
                 </div>
             </ContainerGrid>
 

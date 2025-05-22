@@ -38,7 +38,7 @@ export function HeroSection() {
         >
           <HeadingOrange text="AGILIDADE E EFICIÊNCIA NA TRIAGEM MÉDICA" />
           <ParagraphBlue>
-            Bem-vindo ao <strong className="font-semibold text-3xl">EZHealth</strong>, a triagem inteligente que agiliza o atendimento, reduz filas e otimiza o fluxo de pacientes em hospitais e consultórios.
+            Bem-vindo ao <strong className="font-semibold">EZHealth</strong>, a triagem inteligente que agiliza o atendimento, reduz filas e otimiza o fluxo de pacientes em hospitais e consultórios.
           </ParagraphBlue>
         </div>
 

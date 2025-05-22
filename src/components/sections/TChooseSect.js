@@ -5,12 +5,12 @@ import { ParagraphBlue } from "../ParagraphBlue";
 export function TChooseSect({ onStart, onUrgent }) {
      return (
         <section>
-            <ContainerGrid className="flex items-center justify-around w-full h-screen ">
+            <ContainerGrid className="flex flex-col items-center justify-around w-full h-screen pt-28 md:flex-row md:pt-0">
                 <div onClick={onStart} className="flex flex-col items-center justify-center text-center max-w-96 bg-orange/10 rounded-2xl p-8 hover:bg-orange/50 hover:scale-105 cursor-pointer gap-4 transition-all duration-100 ease-in-out ">
                     <CircleOrangeIcon img="/icons/relatorio-de-saude.svg" />
                     <div >
                         <h4
-                        className="text-orange text-3xl font-bold cursor-pointer"
+                        className="text-orange text-2xl md:text-3xl font-bold cursor-pointer"
                         >
                         INICIAR TRIAGEM
                         </h4>
@@ -24,7 +24,7 @@ export function TChooseSect({ onStart, onUrgent }) {
                     <CircleOrangeIcon img="/icons/relatorio-de-saude.svg" />
                     <div >
                         <h4
-                        className="text-orange text-3xl font-bold cursor-pointer"
+                        className="text-orange text-2xl md:text-3xl font-bold cursor-pointer"
                         >
                         PRECISO DE AJUDA
                         </h4>
