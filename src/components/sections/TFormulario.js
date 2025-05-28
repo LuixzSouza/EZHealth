@@ -1,4 +1,5 @@
 'use client'
+
 import { useState } from 'react';
 import { Header } from '@/components/Header';
 import { TCheckInSecti } from '@/components/sections/TCheckInSecti';
@@ -10,17 +11,17 @@ import { UrgentConfirmationModal } from '@/components/UrgentConfirmationModal';
 import { UrgentReceived } from '@/components/UrgentReceived';
 
 export default function TFormulario() {
-  const steps = [
-    { title: 'Boas-vindas', component: <TriagemHomeSect /> },
-    { title: 'Escolha', component: <TChooseSect /> },
-    { title: 'Check-in', component: <TCheckInSecti /> },
-    { title: 'Formulario', component: <TSymptomsForm /> },
-    { title: 'Confirmação', component: <TConfirmed /> },
-  ];
-
   const [currentStep, setCurrentStep] = useState(0);
   const [showUrgentModal, setShowUrgentModal] = useState(false);
   const [urgentDone, setUrgentDone] = useState(false);
+
+  const handleStart = () => nextStep();
+  const handleUrgent = () => setShowUrgentModal(true);
+  const handleUrgentConfirm = () => {
+    setShowUrgentModal(false);
+    setUrgentDone(true);
+  };
+  const handleUrgentCancel = () => setShowUrgentModal(false);
 
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
@@ -36,64 +37,67 @@ export default function TFormulario() {
     }
   };
 
-  const handleStart = () => nextStep();
-  const handleUrgent = () => setShowUrgentModal(true);
-  const handleUrgentConfirm = () => {
-    setShowUrgentModal(false);
-    setUrgentDone(true);
-  };
-  const handleUrgentCancel = () => setShowUrgentModal(false);
+  const steps = [
+    { title: 'Boas-vindas', component: () => <TriagemHomeSect onStart={handleStart} /> },
+    { title: 'Escolha', component: () => <TChooseSect onStart={handleStart} onUrgent={handleUrgent} /> },
+    { title: 'Check-in', component: () => <TCheckInSecti onNext={nextStep} /> },
+    { title: 'Formulário', component: () => <TSymptomsForm onNext={nextStep} /> },
+    { title: 'Confirmação', component: () => <TConfirmed /> },
+  ];
 
-  // If urgent path completed, show final urgent screen
-  if (urgentDone) {
-    return <UrgentReceived />;
-  }
+  if (urgentDone) return <UrgentReceived />;
 
   return (
     <div className="flex items-center justify-center flex-col min-h-screen relative">
       <Header />
-      <div className="flex-grow w-full">
-        {currentStep === 1 ? (
-          // Insert choose section at logical position
-          <TChooseSect onStart={handleStart} onUrgent={handleUrgent} />
-        ) : (
-          <div className="min-h-screen">
-            {steps[currentStep].component}
-          </div>
-        )}
+      <div className="flex-grow w-full min-h-screen">
+        {steps[currentStep]?.component()}
       </div>
 
-      {/* Navigation controls only if not in urgent modal */}
-      {!showUrgentModal && !urgentDone && currentStep !== 1 && (
-        <div className="fixed bottom-0 w-full flex justify-between items-center p-6 bg-transparent shadow-md z-20">
-          <button
-            onClick={prevStep}
-            disabled={currentStep === 0}
-            className={`px-4 py-2 rounded-md border ${currentStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
-          >
-            Voltar
-          </button>
-
-          <span className="text-gray-700 font-bold">
-            Etapa {currentStep + 1} de {steps.length + 1}: {currentStep === 1 ? 'Escolha' : steps[currentStep].title}
-          </span>
-
-          <button
-            onClick={nextStep}
-            className="px-4 py-2 rounded-md bg-orange text-white hover:bg-orange-dark"
-          >
-            {currentStep === steps.length - 1 ? 'Aguarde...' : 'Próximo'}
-          </button>
-        </div>
+      {!showUrgentModal && !urgentDone && currentStep !== 0 && currentStep !== 1 && currentStep !== 2 && currentStep !== 3 && currentStep !== 4 && (
+        <StepNavigator
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onNext={nextStep}
+          onBack={prevStep}
+          title={steps[currentStep].title}
+        />
       )}
 
-      {/* Urgent confirmation modal */}
       {showUrgentModal && (
         <UrgentConfirmationModal
           onConfirm={handleUrgentConfirm}
           onCancel={handleUrgentCancel}
         />
       )}
+    </div>
+  );
+}
+
+function StepNavigator({ currentStep, totalSteps, onNext, onBack, title }) {
+  return (
+    <div className="fixed bottom-0 w-full flex justify-between items-center p-6 bg-white shadow z-20">
+      <button
+        onClick={onBack}
+        disabled={currentStep === 0}
+        className={`px-4 py-2 rounded-md border ${currentStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+        aria-label="Voltar etapa"
+      >
+        Voltar
+      </button>
+
+      <span className="text-gray-700 font-bold text-sm sm:text-base">
+        Etapa {currentStep + 1} de {totalSteps}: {title}
+      </span>
+
+      <button
+        onClick={onNext}
+        disabled={currentStep === totalSteps - 1}
+        className={`px-4 py-2 rounded-md text-white ${currentStep === totalSteps - 1 ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange hover:bg-orange-dark'}`}
+        aria-label="Avançar etapa"
+      >
+        {currentStep === totalSteps - 1 ? 'Aguarde...' : 'Próximo'}
+      </button>
     </div>
   );
 }

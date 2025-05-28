@@ -65,7 +65,7 @@ export function BeneficiosSection() {
                 <span className="text-2xl">{ativo === index ? '−' : '+'}</span>
               </button>
               {ativo === index && (
-                <div className="px-6 pb-4 text-white text-2xl">
+                <div className=" bg-white/30 px-6 py-4 text-white text-2xl">
                   {item.descricao}
                 </div>
               )}

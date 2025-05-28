@@ -13,27 +13,34 @@ export function HeroSection() {
   const imageRef = useRef(null);
 
   useEffect(() => {
-    gsap.from(textRef.current, {
-      opacity: 0,
-      y: 50,
-      duration: 1,
-      ease: "power3.out",
-    });
+    const tl = gsap.timeline();
 
-    gsap.from(imageRef.current, {
-      opacity: 0,
-      x: 50,
-      duration: 1,
-      delay: 0.5,
-      ease: "power3.out",
-    });
+    tl.set([textRef.current, imageRef.current], { autoAlpha: 0 }) // invisível inicialmente
+
+      .to(textRef.current, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out",
+      })
+
+      .to(
+        imageRef.current,
+        {
+          autoAlpha: 1,
+          x: 0,
+          duration: 1,
+          ease: "power3.out",
+        },
+        "-=0.5" // começa antes da anterior terminar
+      );
   }, []);
 
   return (
     <section className="relative w-full h-full overflow-hidden shadow-2xl shadow-black/10 pt-24">
       <ContainerGrid className="flex flex-col items-center justify-between pt-14 lg:flex-row lg:pt-0">
         <div
-          className=" w-full max-w-2xl flex flex-col gap-7"
+          className="w-full max-w-2xl flex flex-col gap-7 opacity-0 translate-y-6" // estado inicial se JS falhar
           ref={textRef}
         >
           <HeadingOrange text="AGILIDADE E EFICIÊNCIA NA TRIAGEM MÉDICA" />
@@ -42,8 +49,17 @@ export function HeroSection() {
           </ParagraphBlue>
         </div>
 
-        <div ref={imageRef}>
-          <Image src="/images/avatar-2.png" width={400} height={200} alt="avatar" />
+        <div
+          className="opacity-0 translate-x-6"
+          ref={imageRef}
+        >
+          <Image
+            src="/images/avatar-2.png"
+            width={400}
+            height={200}
+            alt="avatar"
+            priority
+          />
         </div>
       </ContainerGrid>
 

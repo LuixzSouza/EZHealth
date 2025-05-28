@@ -40,9 +40,9 @@ export default function Home() {
       <HowWorksSection/>
       <VideoSection/>
       <ContactUsSection/>
-      <button onClick={handleSubmit} style={{margin: '2rem', padding: '1rem', background: '#0070f3', color: 'white', border: 'none', borderRadius: '5px'}}>
+      {/* <button onClick={handleSubmit} style={{margin: '2rem', padding: '1rem', background: '#0070f3', color: 'white', border: 'none', borderRadius: '5px'}}>
         Enviar dados de teste
-      </button>
+      </button> */}
 
     </>
   );
