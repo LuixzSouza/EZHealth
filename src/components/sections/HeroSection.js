@@ -37,7 +37,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative w-full h-full overflow-hidden shadow-2xl shadow-black/10 pt-24">
+    <section className="relative w-full h-full overflow-hidden shadow-2xl shadow-black/10 pt-28">
       <ContainerGrid className="flex flex-col items-center justify-between pt-14 lg:flex-row lg:pt-0">
         <div
           className="w-full max-w-2xl flex flex-col gap-7 opacity-0 translate-y-6" // estado inicial se JS falhar

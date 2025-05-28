@@ -45,7 +45,7 @@ export function BeneficiosSection() {
   }, []);
 
   return (
-    <section className="py-14" id="sbeneficio">
+    <section className="py-14 overflow-hidden" id="sbeneficio">
       <ContainerGrid>
         <HeadingDarkBlue text="Benefícios EZHealth" />
 

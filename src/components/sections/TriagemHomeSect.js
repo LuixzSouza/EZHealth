@@ -7,7 +7,7 @@ export function TriagemHomeSect({ onStart }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <section className="overflow-hidden h-screen bg-white">
+    <section className="pt-32 overflow-hidden h-screen bg-white">
       <ContainerGrid className="flex flex-col items-center justify-center h-full gap-8 px-4 text-center lg:text-left">
         {/* Logo */}
         <Image src="/logo.png" width={180} height={60} alt="Logo" />

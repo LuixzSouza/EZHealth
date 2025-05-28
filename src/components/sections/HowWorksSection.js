@@ -34,7 +34,7 @@ export function HowWorksSection() {
   }, []);
 
   return (
-    <section className="py-14" id="scomofunciona">
+    <section className="py-14 overflow-hidden" id="scomofunciona">
       <ContainerGrid>
         <HeadingOrange text="Como funciona o EZHealth?" />
         <div className="flex flex-col gap-8 mt-10">

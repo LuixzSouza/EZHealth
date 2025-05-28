@@ -18,7 +18,7 @@ export function TSymptomsForm({ onNext }) {
   ];
 
   return (
-    <section className="flex items-center justify-center w-full min-h-screen bg-gray-50 px-4">
+    <section className="pt-32 flex items-center justify-center w-full min-h-screen bg-gray-50 px-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"

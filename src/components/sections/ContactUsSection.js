@@ -48,7 +48,7 @@ export function ContactUsSection() {
     };
 
     return (
-        <section className="flex flex-col items-center justify-between pt-14 lg:flex-row lg:items-end" id="scontato">
+        <section className="flex flex-col items-center justify-between pt-14 lg:flex-row lg:items-end overflow-hidden" id="scontato">
             <ContainerGrid className="flex flex-col items-start justify-end gap-5">
                 <HeadingOrange text="FALE CONOSCO!" />
                 <ParagraphBlue>

@@ -25,7 +25,7 @@ function CardOption({ onClick, title, description }) {
 
 export function TChooseSect({ onStart, onUrgent }) {
   return (
-    <section>
+    <section className="pt-32" >
       <ContainerGrid className="flex flex-col items-center justify-center w-full min-h-screen gap-10 pt-28 md:flex-row md:pt-0">
         <CardOption
           onClick={onStart}

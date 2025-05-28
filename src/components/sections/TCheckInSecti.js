@@ -21,7 +21,7 @@ export function TCheckInSecti({ onNext }) {
   };
 
   return (
-    <section>
+    <section className="pt-12" >
       <ContainerGrid className="flex flex-col items-center justify-center min-h-screen text-center px-4 py-10">
 
         <form

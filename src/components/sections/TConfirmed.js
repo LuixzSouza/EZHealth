@@ -4,7 +4,7 @@ import { ParagraphBlue } from "../ParagraphBlue";
 
 export function TConfirmed() {
   return (
-    <section className="h-screen flex items-center justify-center bg-white px-4">
+    <section className="pt-36 h-screen flex items-center justify-center bg-white px-4">
       <ContainerGrid className="w-full max-w-lg bg-orange/10 shadow-xl rounded-3xl p-10 flex flex-col items-center gap-6 text-center">
 
         <HeadingOrange text="ATENDIMENTO CONFIRMADO" />
