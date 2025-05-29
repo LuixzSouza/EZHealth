@@ -10,6 +10,10 @@
   font-family: var(--font-montserrat);
 }
 
+.dark body {
+  @apply bg-themeDark text-white;
+}
+
 a {
   color: inherit;
   text-decoration: none;

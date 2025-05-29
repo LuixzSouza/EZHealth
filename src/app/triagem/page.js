@@ -1,9 +1,10 @@
-import TFormulario from "@/components/sections/TFormulario";
+import T_00_Formulario from "@/components/sections/triagem/T_00_Formulario";
+
 
 export default function Formulario() {
     return(
         <>
-            <TFormulario/>
+            <T_00_Formulario/>
         </>
     )
 }

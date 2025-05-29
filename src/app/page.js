@@ -1,13 +1,13 @@
 'use client'
 
-import { Header } from "@/components/Header";
-import { Menu } from "@/components/Menu";
-import { BeneficiosSection } from "@/components/sections/BeneficiosSection";
-import { ContactUsSection } from "@/components/sections/ContactUsSection";
-import { HeroSection } from "@/components/sections/HeroSection";
-import { HowWorksSection } from "@/components/sections/HowWorksSection";
-import { VideoSection } from "@/components/sections/VideoSection";
-import { WhatIsSection } from "@/components/sections/WhatIsSection";
+import { Header } from "@/components/layout/Header";
+import { Menu } from "@/components/layout/Menu";
+import { H_BeneficiosSection } from "@/components/sections/home/H_BeneficiosSection";
+import { H_ContactUsSection } from "@/components/sections/home/H_ContactUsSection";
+import { HeroSection } from "@/components/sections/home/HeroSection";
+import { H_HowWorksSection } from "@/components/sections/home/H_HowWorksSection";
+import { H_VideoSection } from "@/components/sections/home/H_VideoSection";
+import { H_WhatIsSection } from "@/components/sections/home/H_WhatIsSection";
 
 export default function Home() {
   const handleSubmit = async () => {
@@ -35,15 +35,14 @@ export default function Home() {
       <Menu/>
       <Header/>
       <HeroSection/>
-      <WhatIsSection/>
-      <BeneficiosSection/>
-      <HowWorksSection/>
-      <VideoSection/>
-      <ContactUsSection/>
+      <H_WhatIsSection/>
+      <H_BeneficiosSection/>
+      <H_HowWorksSection/>
+      <H_VideoSection/>
+      <H_ContactUsSection/>
       {/* <button onClick={handleSubmit} style={{margin: '2rem', padding: '1rem', background: '#0070f3', color: 'white', border: 'none', borderRadius: '5px'}}>
         Enviar dados de teste
       </button> */}
-
     </>
   );
 }
