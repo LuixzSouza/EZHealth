@@ -1,5 +1,7 @@
 'use client';
 
+import { ParagraphBlue } from '@/components/theme/ParagraphBlue';
+import { Heading } from '@/components/typography/Heading';
 import { useForm } from 'react-hook-form';
 
 export function T_07_MedicalHistory({ onNext }) {
@@ -25,13 +27,11 @@ export function T_07_MedicalHistory({ onNext }) {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white/10 shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"
       >
-        <h2 className="text-3xl font-extrabold text-orange text-center mb-4">
-          Histórico Médico
-        </h2>
-
-        <p className="text-blue-800 dark:text-white text-sm text-center mb-2">
+        <Heading as="h2" text="Histórico Médico" colorClass="dark:text-orangeDark text-orange" className='md:text-3xl' />
+        
+        <ParagraphBlue>
           Alguma das condições abaixo se aplica a você?
-        </p>
+        </ParagraphBlue>
 
         <div className="flex flex-col gap-2">
           {historyOptions.map((item) => (

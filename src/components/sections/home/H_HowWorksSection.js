@@ -5,8 +5,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { ContainerGrid } from "../../layout/ContainerGrid";
-import { HeadingOrange } from "../../theme/HeadingOrange";
 import { ListFunctions } from '../../layout/ListFunctions';
+import { Heading } from '@/components/typography/Heading';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -36,7 +36,7 @@ export function H_HowWorksSection() {
   return (
     <section className="dark:bg-themeDark py-14 overflow-hidden" id="scomofunciona">
       <ContainerGrid>
-        <HeadingOrange text="Como funciona o EZHealth?" />
+        <Heading colorClass='dark:text-orangeDark text-orange' text='Como funciona o EZHealth?'/>
         <div className="flex flex-col gap-8 mt-10">
           {[
             {

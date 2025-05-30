@@ -1,15 +1,18 @@
 'use client'
 
-import Image from "next/image";
-import { ContainerGrid } from "./ContainerGrid";
-import { useState } from "react";
-import { Menu } from "./Menu";
+// Next - React
 import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
+import { usePathname } from 'next/navigation';
+
+// Componentes
+import { Menu } from "./Menu";
+import { MenuSearch } from "./MenuSearch";
+import { DarkTheme } from "../theme/DarkTheme";
+import { ContainerGrid } from "./ContainerGrid";
 import { AtalhosTeclado } from "../utils/AtalhosTeclado";
 import { ToolAssistentText } from "../utils/ToolAssistentText";
-import { usePathname } from 'next/navigation';
-import { DarkTheme } from "../theme/DarkTheme";
-import { MenuSearch } from "./MenuSearch";
 
 export function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -21,9 +24,12 @@ export function Header() {
             <header className="w-full sticky top-0 dark:bg-themeDark bg-white z-50 shadow-2xl shadow-black/10 dark:shadow-white/5" >
                 <ContainerGrid className="flex items-center justify-between" >
                     <div className="flex items-start justify-start" >
-                        <Link href={"/#"}>
+                        <Link href={"/#"} className="relative group" >
                             <Image src={"/logo.png"} width={180} height={60} alt="Icon" className="block dark:hidden"/>
                             <Image src={"/logo-white.png"} width={180} height={60} alt="Icon" className="hidden dark:block"/>
+                            <ToolAssistentText>
+                                Inicio <span className="text-gray-400">(Esc)</span>
+                            </ToolAssistentText>
                         </Link>
                     </div>
                     <ul className="flex items-center justify-end gap-4" >

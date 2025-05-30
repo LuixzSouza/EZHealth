@@ -1,5 +1,7 @@
 'use client';
 
+import { ParagraphBlue } from '@/components/theme/ParagraphBlue';
+import { Heading } from '@/components/typography/Heading';
 import { useForm } from 'react-hook-form';
 
 export function T_05_SymptomsDirector({ onNext }) {
@@ -25,13 +27,12 @@ export function T_05_SymptomsDirector({ onNext }) {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white/10 shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"
       >
-        <h2 className="text-3xl font-extrabold text-orange text-center mb-4">
-          Queixa Principal
-        </h2>
+        
+        <Heading as="h2" text="Queixa Principal" colorClass="dark:text-orangeDark text-orange" className='md:text-4xl' />
 
-        <p className="text-blue-800 dark:text-white text-sm text-center">
+        <ParagraphBlue>
           Descreva com suas palavras ou selecione uma ou mais opções abaixo:
-        </p>
+        </ParagraphBlue>
 
         <div className="flex flex-col gap-2">
           {symptomOptions.map((symptom) => (

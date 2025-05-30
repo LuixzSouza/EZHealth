@@ -1,5 +1,5 @@
 
-# eZHealth
+# EZHealth
 ![Logo EZHealth](coverGitHub.png)
 
 ## Oque é:
@@ -12,9 +12,14 @@ Totalmente personalizável e integrado a
 sistemas hospitalares, melhora a gestão, reduz
 filas e otimiza recursos.
 
+## Site Online:
+
+[Acessar 👉](https://ezhealthluixz.netlify.app)
+
 ## Design:
 
 [EZHealth Site](https://www.canva.com/design/DAGjm0LMrXk/JgpTmeAWvarjCwAP6ISKEg/edit)
+
 [EZHealth Formulario](https://www.canva.com/design/DAGjm9eUW2U/4-LDdSFBJxo9_gVhzHLmzw/edit)
 
 
@@ -28,6 +33,8 @@ filas e otimiza recursos.
 - GitHub
 - React.js
 - Next.js
+- recharts (Graficos)
+- next-intl (Linguagem)
 
 ## Rodar o projeto:
 
@@ -37,7 +44,8 @@ npm install
 
 # Visualizar
 npm run dev
-# or
+
+# ou
 yarn dev
 ```
 
@@ -65,5 +73,5 @@ Estrutura da EzHealth com Expansão Comercial
 - Renan - Especialista em Tecnologia e Suporte
 
 ## Desenvolvedores
-Luiz Antônio de Souza
-Renan Carlos
+- Luiz Antônio de Souza
+- Renan Carlos

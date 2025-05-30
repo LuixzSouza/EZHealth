@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ContainerGrid } from "@/components/layout/ContainerGrid";
-import { HeadingOrange } from "@/components/theme/HeadingOrange";
 import { ToolAssistentText } from "@/components/utils/ToolAssistentText";
+import { Heading } from "@/components/typography/Heading";
 
 export function H_VideoSection() {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -12,7 +12,7 @@ export function H_VideoSection() {
     return (
         <section className="dark:bg-themeDark py-14">
             <ContainerGrid>
-                <HeadingOrange text="Vídeo utilizando o software" />
+                <Heading colorClass='dark:text-orangeDark text-orange' text='Vídeo utilizando o software'/>
                 <div className="flex flex-col items-center justify-center gap-10 bg-orange rounded-3xl h-[580px] overflow-hidden relative mt-11">
 
                     {/* Se não estiver tocando, mostra o botão */}

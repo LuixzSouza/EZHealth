@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ContainerGrid } from '../../layout/ContainerGrid';
-import { HeadingDarkBlue } from '../../theme/HeadingDarkBlue';
+import { Heading } from '@/components/typography/Heading';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,8 +47,8 @@ export function H_BeneficiosSection() {
   return (
     <section className="dark:bg-themeDark py-14 overflow-hidden" id="sbeneficio">
       <ContainerGrid>
-        <HeadingDarkBlue text="Benefícios EZHealth" />
-
+        
+        <Heading colorClass='dark:text-themeTextDark text-DarkBlue' text='Benefícios EZHealth'/>
         <div className="flex flex-col items-center justify-start mt-10 gap-4">
           {beneficios.map((item, index) => (
             <div

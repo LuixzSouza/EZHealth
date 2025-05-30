@@ -2,6 +2,8 @@
 
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
+import { ParagraphBlue } from '@/components/theme/ParagraphBlue';
+import { Heading } from '@/components/typography/Heading';
 
 export function T_08_Medication({ onNext }) {
   const { register, handleSubmit, watch } = useForm();
@@ -17,13 +19,11 @@ export function T_08_Medication({ onNext }) {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white/10 shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"
       >
-        <h2 className="text-3xl font-extrabold text-orange text-center mb-4">
-          Uso de Medicamentos
-        </h2>
-
-        <p className="text-blue-800 dark:text-white text-sm text-center mb-2">
+        <Heading as="h2" text="Uso de Medicamentos" colorClass="dark:text-orangeDark text-orange" className='md:text-3xl' />
+                
+        <ParagraphBlue>
           Você faz uso contínuo de algum medicamento?
-        </p>
+        </ParagraphBlue>
 
         <div className="flex flex-col gap-3">
           <label className="inline-flex items-center gap-2">

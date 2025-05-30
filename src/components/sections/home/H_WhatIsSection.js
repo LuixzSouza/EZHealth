@@ -5,8 +5,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from "next/image";
 import { ContainerGrid } from '@/components/layout/ContainerGrid';
-import { HeadingOrange } from '@/components/theme/HeadingOrange';
 import { ParagraphBlue } from '@/components/theme/ParagraphBlue';
+import { Heading } from '@/components/typography/Heading';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -49,7 +49,7 @@ export function H_WhatIsSection() {
     <section className="dark:bg-themeDark py-14 overflow-hidden" id="swhatis">
       <ContainerGrid className="flex flex-col items-center justify-between lg:flex-row">
         <div ref={textRef} className="w-full max-w-2xl flex flex-col gap-7">
-          <HeadingOrange text="O que é EZHealth?" />
+          <Heading colorClass='dark:text-orangeDark text-orange' text='O que é EZHealth?'/>
           <ParagraphBlue>
             O <strong className="font-semibold ">EZHealth</strong> é um software de <strong className="font-semibold ">triagem rápida e inteligente</strong> para hospitais e consultórios, agilizando o atendimento por meio de <strong className="font-semibold ">check-in digital, formulário de triagem</strong> e <strong className="font-semibold ">direcionamento automático</strong> ao especialista.
           </ParagraphBlue>

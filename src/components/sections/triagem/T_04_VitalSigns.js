@@ -1,5 +1,7 @@
 'use client';
 
+import { ParagraphBlue } from '@/components/theme/ParagraphBlue';
+import { Heading } from '@/components/typography/Heading';
 import { useForm } from 'react-hook-form';
 
 export function T_04_VitalSigns({ onNext, defaultValues = {} }) {
@@ -23,13 +25,11 @@ export function T_04_VitalSigns({ onNext, defaultValues = {} }) {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white/10 shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"
       >
-        <h2 className="text-3xl font-extrabold text-orange text-center mb-4">
-          Sinais Vitais
-        </h2>
+        <Heading as="h2" text="Sinais Vitais" colorClass="dark:text-orangeDark text-orange" />
 
-        <p className="text-blue-800 dark:text-white text-sm text-center mb-2">
+        <ParagraphBlue>
           Esses dados são capturados automaticamente pelos sensores do totem. Verifique se estão corretos.
-        </p>
+        </ParagraphBlue>
 
         <div className="flex flex-col gap-4">
           <div>

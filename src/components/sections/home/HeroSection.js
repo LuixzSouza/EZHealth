@@ -7,6 +7,7 @@ import { HeadingOrange } from "../../theme/HeadingOrange";
 import { ParagraphBlue } from "../../theme/ParagraphBlue";
 import { ContainerGrid } from "../../layout/ContainerGrid";
 import { ScrollDown } from "../../utils/ScrollDown";
+import { Heading } from "@/components/typography/Heading";
 
 export function HeroSection() {
   const textRef = useRef(null);
@@ -43,7 +44,7 @@ export function HeroSection() {
           className="w-full max-w-2xl flex flex-col gap-7 opacity-0 translate-y-6" // estado inicial se JS falhar
           ref={textRef}
         >
-          <HeadingOrange text="AGILIDADE E EFICIÊNCIA NA TRIAGEM MÉDICA" />
+          <Heading as="h1" className="md:text-7xl" colorClass='dark:text-orangeDark text-orange' text='AGILIDADE E EFICIÊNCIA NA TRIAGEM MÉDICA'/>
           <ParagraphBlue>
             Bem-vindo ao <strong className="font-semibold">EZHealth</strong>, a triagem inteligente que agiliza o atendimento, reduz filas e otimiza o fluxo de pacientes em hospitais e consultórios.
           </ParagraphBlue>

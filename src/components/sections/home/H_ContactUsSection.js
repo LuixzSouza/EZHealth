@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ContainerGrid } from "@/components/layout/ContainerGrid";
-import { HeadingOrange } from "@/components/theme/HeadingOrange";
 import { ParagraphBlue } from "@/components/theme/ParagraphBlue";
+import { Heading } from "@/components/typography/Heading";
 
 export function H_ContactUsSection() {
     const [formData, setFormData] = useState({
@@ -15,6 +15,7 @@ export function H_ContactUsSection() {
     });
 
     const [errors, setErrors] = useState({});
+    const [formVisible, setFormVisible] = useState(false); // Novo estado para controlar a visibilidade do formulário
     const [submitted, setSubmitted] = useState(false);
 
     const validate = () => {
@@ -44,13 +45,15 @@ export function H_ContactUsSection() {
             setSubmitted(true);
             setFormData({ nome: "", email: "", telefone: "", mensagem: "" });
             setErrors({});
+            // O formulário pode permanecer visível ou ser escondido após o envio,
+            // dependendo da UX desejada. Por enquanto, ele continua visível.
         }
     };
 
     return (
         <section className="dark:bg-themeDark flex flex-col items-center justify-between pt-14 lg:flex-row lg:items-end overflow-hidden" id="scontato">
             <ContainerGrid className="flex flex-col items-start justify-end gap-5 pb-10">
-                <HeadingOrange text="FALE CONOSCO!" />
+                <Heading colorClass='dark:text-orangeDark text-orange' text='FALE CONOSCO!'/>
                 <ParagraphBlue>
                     Tem dúvidas? Entre em contato e descubra como o EZHealth pode transformar seu atendimento!
                 </ParagraphBlue>
@@ -60,66 +63,95 @@ export function H_ContactUsSection() {
                 </div>
             </ContainerGrid>
 
-            <form onSubmit={handleSubmit} className="w-full max-w-screen-sm flex flex-col items-start justify-start gap-6 bg-orange p-10 rounded-md mt-14 z-10 lg:mb-0">
-                <div className="w-full">
-                    <label className="text-white">Nome:</label>
-                    <input
-                        type="text"
-                        name="nome"
-                        value={formData.nome}
-                        onChange={handleChange}
-                        className="w-full p-2 rounded-md border-2 border-white"
+            {/* Condicionalmente renderiza o botão ou o formulário */}
+            {!formVisible ? (
+                <div className="w-full max-w-screen-sm flex flex-col items-center justify-center gap-6 bg-orange dark:bg-orange/70 p-10 rounded-md mt-14 z-10 lg:mb-0 h-96 text-center">
+                    <Heading
+                        as="h3" // Usando h3 para ser um subtítulo visual
+                        text="Interessado em Nossas Soluções?"
+                        colorClass="text-white" // Texto branco para contraste com o fundo laranja
+                        className="!text-3xl !md:text-4xl" // Sobrescrevendo o tamanho se necessário, ou usar 'variant'
                     />
-                    {errors.nome && <p className="text-white text-sm mt-1">{errors.nome}</p>}
+                    <p className="text-white text-lg leading-relaxed mb-4">
+                        Preencha o formulário e nossa equipe entrará em contato com você o mais breve possível.
+                        Estamos prontos para tirar suas dúvidas e apresentar as vantagens do EZHealth para sua clínica!
+                    </p>
+                    {/* Botão "Iniciar Conversa" */}
+                    <button
+                        onClick={() => setFormVisible(true)}
+                        className="bg-white text-orange px-8 py-3 rounded-full font-semibold hover:bg-orange-dark hover:bg-transparent hover:text-white hover:border hover:border-white transition-colors text-xl shadow-lg"
+                    >
+                        Iniciar Conversa
+                    </button>
                 </div>
-
-                <div className="w-full">
-                    <label className="text-white">E-mail:</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full p-2 rounded-md border-2 border-white"
-                    />
-                    {errors.email && <p className="text-white text-sm mt-1">{errors.email}</p>}
-                </div>
-
-                <div className="w-full">
-                    <label className="text-white">Telefone:</label>
-                    <input
-                        type="tel"
-                        name="telefone"
-                        value={formData.telefone}
-                        onChange={handleChange}
-                        className="w-full p-2 rounded-md border-2 border-white"
-                    />
-                    {errors.telefone && <p className="text-white text-sm mt-1">{errors.telefone}</p>}
-                </div>
-
-                <div className="w-full">
-                    <label className="text-white">Mensagem:</label>
-                    <textarea
-                        name="mensagem"
-                        value={formData.mensagem}
-                        onChange={handleChange}
-                        rows={5}
-                        className="w-full p-2 rounded-md border-2 border-white resize-none"
-                    />
-                    {errors.mensagem && <p className="text-white text-sm mt-1">{errors.mensagem}</p>}
-                </div>
-
-                <button
-                    type="submit"
-                    className="text-white text-2xl border-2 border-white rounded-full px-8 py-3 hover:bg-white hover:text-orange transition"
+            ) : (
+                <form
+                    onSubmit={handleSubmit}
+                    className={`
+                        w-full max-w-screen-sm flex flex-col items-start justify-start gap-6 bg-orange p-10 rounded-md mt-14 z-10 lg:mb-0
+                        transition-all duration-500 ease-in-out opacity-100 scale-100
+                    `}
                 >
-                    Enviar
-                </button>
+                    <div className="w-full">
+                        <label className="text-white">Nome:</label>
+                        <input
+                            type="text"
+                            name="nome"
+                            value={formData.nome}
+                            onChange={handleChange}
+                            className="w-full p-2 rounded-md border-2 border-white focus:outline-none focus:border-orange-dark text-DarkBlue"
+                        />
+                        {errors.nome && <p className="text-white text-sm mt-1">{errors.nome}</p>}
+                    </div>
 
-                {submitted && (
-                    <p className="text-white text-lg mt-2">Mensagem enviada com sucesso!</p>
-                )}
-            </form>
+                    <div className="w-full">
+                        <label className="text-white">E-mail:</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="w-full p-2 rounded-md border-2 border-white focus:outline-none focus:border-orange-dark text-DarkBlue"
+                        />
+                        {errors.email && <p className="text-white text-sm mt-1">{errors.email}</p>}
+                    </div>
+
+                    <div className="w-full">
+                        <label className="text-white">Telefone:</label>
+                        <input
+                            type="tel"
+                            name="telefone"
+                            value={formData.telefone}
+                            onChange={handleChange}
+                            className="w-full p-2 rounded-md border-2 border-white focus:outline-none focus:border-orange-dark text-DarkBlue"
+                        />
+                        {errors.telefone && <p className="text-white text-sm mt-1">{errors.telefone}</p>}
+                    </div>
+
+                    <div className="w-full">
+                        <label className="text-white">Mensagem:</label>
+                        <textarea
+                            name="mensagem"
+                            value={formData.mensagem}
+                            onChange={handleChange}
+                            rows={5}
+                            className="w-full p-2 rounded-md border-2 border-white resize-none focus:outline-none focus:border-orange-dark text-DarkBlue"
+                        />
+                        {errors.mensagem && <p className="text-white text-sm mt-1">{errors.mensagem}</p>}
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="text-white text-2xl border-2 border-white rounded-full px-8 py-3 hover:bg-white hover:text-orange transition"
+                    >
+                        Enviar
+                    </button>
+
+                    {submitted && (
+                        <p className="text-white text-lg mt-2">Mensagem enviada com sucesso!</p>
+                    )}
+                </form>
+            )}
         </section>
     );
 }

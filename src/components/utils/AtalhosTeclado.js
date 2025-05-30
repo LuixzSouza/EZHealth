@@ -20,6 +20,12 @@ export function AtalhosTeclado({ setIsOpenSearch, setIsOpenMenu }) {
             case 'l':
                 router.push('/login-medico');
             break;
+            case 't':
+                router.push('/triagem');
+            break;
+            case 'escape': //Esc
+                router.push('/');
+            break;
             default:
             break;
         }

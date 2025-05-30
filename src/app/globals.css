@@ -32,3 +32,16 @@ ul, ol {
 html {
   scroll-behavior: smooth;
 }
+
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-in-out forwards;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+}

@@ -1,88 +1,133 @@
 'use client';
 
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ContainerGrid } from "@/components/layout/ContainerGrid";
+
 import { HeadingOrange } from "@/components/theme/HeadingOrange";
 import { ParagraphBlue } from "@/components/theme/ParagraphBlue";
 import { Header } from "@/components/layout/Header";
+import { Heading } from "@/components/typography/Heading";
+import { DashboardTab } from "@/components/sections/painelMedico/DashboardTab";
+import { PacientesTab } from "@/components/sections/painelMedico/PacientesTab";
+import { AgendaTab } from "@/components/sections/painelMedico/AgendaTab";
+import { TriagensTab } from "@/components/sections/painelMedico/TriagensTab";
+import { ConfiguracoesTab } from "@/components/sections/painelMedico/ConfiguracoesTab";
+import { RelatoriosTab } from "@/components/sections/painelMedico/RelatoriosTab";
 
 export default function PainelMedico() {
+  const [medico, setMedico] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const router = useRouter();
+
   useEffect(() => {
     document.title = "Painel Médico - EZHealth";
+    const medicoLogado = localStorage.getItem("medicoLogado");
+    if (!medicoLogado) {
+      router.push("/login-medico");
+    } else {
+      setMedico(JSON.parse(medicoLogado));
+    }
   }, []);
+
+  if (!medico) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <p>Carregando painel...</p>
+      </div>
+    );
+  }
+
+  const renderTab = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <DashboardTab />;
+      case 'pacientes':
+        return <PacientesTab />;
+      case 'agenda':
+        return <AgendaTab />;
+      case 'triagens':
+        return <TriagensTab />;
+      case 'relatorios':
+        return <RelatoriosTab />;
+      case 'configuracoes':
+        return <ConfiguracoesTab />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
       <Header />
-      <section className="py-14 min-h-screen bg-gray-50 relative">
-        <button className="absolute top-6 right-6 text-sm text-red-600 hover:underline">Sair</button>
-
-        <ContainerGrid>
-          <div className="flex items-center gap-4 mt-6">
-            <Image src="/icons/medico-avatar.svg" width={50} height={50} alt="Avatar" className="rounded-full" />
-            <div>
-              <p className="text-blue-900 font-semibold">Dr. Marcos Andrade</p>
-              <p className="text-sm text-gray-600">Clínico Geral</p>
-            </div>
+      <div className="flex min-h-screen">
+        <aside className={`bg-white dark:bg-white/10 w-64 p-6 space-y-6 shadow-md ${sidebarOpen ? 'block' : 'hidden'} md:block`}>
+          <div className="flex flex-col items-center">
+            <Image
+              src={medico.foto || "/icons/medico-avatar.svg"}
+              width={80}
+              height={80}
+              alt="Avatar"
+              className="rounded-full"
+            />
+            <Heading as="h2" text={medico.nome} colorClass="text-DarkBlue dark:text-white" className="mt-4 md:text-lg" />
+            <p className="text-sm text-gray-500 text-center">{medico.especialidade}</p>
           </div>
 
-          <HeadingOrange text="Painel do Médico" />
-          <ParagraphBlue>
-            Bem-vindo ao painel médico da plataforma EZHealth. Aqui você pode acessar suas funções principais.
-          </ParagraphBlue>
+          <nav className="flex flex-col gap-2">
+            {['dashboard','pacientes','agenda','triagens','relatorios','configuracoes'].map(tab => (
+              <SidebarLink
+                key={tab}
+                icon={`/icons/${tab}.svg`}
+                title={tab === 'dashboard' ? 'Visão Geral' :
+                       tab === 'pacientes' ? 'Meus Pacientes' :
+                       tab === 'agenda' ? 'Agenda de Consultas' :
+                       tab === 'triagens' ? 'Triagens Pendentes' :
+                       tab === 'relatorios' ? 'Relatórios' : 'Configurações'}
+                tab={tab}
+                activeTab={activeTab}
+                onClick={setActiveTab}
+              />
+            ))}
+          </nav>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
-            <StatCard label="Pacientes Ativos" value="28" />
-            <StatCard label="Consultas Hoje" value="5" />
-            <StatCard label="Triagens Pendentes" value="3" />
-            <StatCard label="Alertas Críticos" value="1" />
-          </div>
+          <button
+            onClick={() => {
+              localStorage.removeItem("medicoLogado");
+              router.push("/login-medico");
+            }}
+            className="text-red-600 flex items-center gap-2 mt-6 hover:underline text-sm"
+          >
+            <Image src="/icons/sair.svg" width={20} height={20} alt="Sair" />
+            Sair
+          </button>
+        </aside>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
-            <Card icon="/icons/paciente.svg" title="Meus Pacientes" href="/medico/pacientes" />
-            <Card icon="/icons/agenda.svg" title="Agenda de Consultas" href="/medico/agenda" />
-            <Card icon="/icons/triagem.svg" title="Triagens Pendentes" href="/medico/triagens" />
-            <Card icon="/icons/relatorio.svg" title="Relatórios Médicos" href="/medico/relatorios" />
-            <Card icon="/icons/config.svg" title="Configurações" href="/medico/configuracoes" />
-          </div>
+        <main className="flex-1 p-6 bg-gray-50 dark:bg-themeDark">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="mb-4 md:hidden bg-blue-100 dark:bg-gray-700 text-blue-900 dark:text-white px-3 py-1 rounded"
+          >
+            {sidebarOpen ? 'Fechar Menu' : 'Abrir Menu'}
+          </button>
 
-          <div className="mt-10 flex gap-4">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition">Nova Consulta</button>
-            <button className="bg-orange-500 text-white px-6 py-3 rounded-xl hover:bg-orange-600 transition">Registrar Triagem</button>
-          </div>
-
-          <div className="mt-12 bg-white rounded-xl shadow p-6">
-            <h4 className="text-lg font-semibold text-blue-900 mb-4">Notificações recentes</h4>
-            <ul className="space-y-2 text-sm text-blue-800">
-              <li>🔔 Nova triagem pendente de João Silva</li>
-              <li>📅 Consulta agendada com Maria Oliveira às 14h</li>
-              <li>📝 Novo relatório médico solicitado</li>
-            </ul>
-          </div>
-        </ContainerGrid>
-      </section>
+          {renderTab()}
+        </main>
+      </div>
     </>
   );
 }
 
-function Card({ icon, title, href }) {
+function SidebarLink({ icon, title, tab, activeTab, onClick }) {
+  const isActive = activeTab === tab;
   return (
-    <a
-      href={href}
-      className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-6 flex flex-col items-center justify-center gap-4 hover:scale-105"
+    <button
+      onClick={() => onClick(tab)}
+      className={`flex items-center gap-3 px-3 py-2 rounded-md w-full text-left transition group ${isActive ? 'bg-orange dark:bg-orange' : 'hover:bg-orange/80 dark:hover:bg-gray/40'}`}
     >
-      <Image src={icon} alt={title} width={64} height={64} />
-      <h3 className="text-xl font-semibold text-center text-blue-900">{title}</h3>
-    </a>
-  );
-}
-
-function StatCard({ label, value }) {
-  return (
-    <div className="bg-blue-100 text-blue-900 rounded-xl p-4 text-center shadow">
-      <div className="text-3xl font-bold">{value}</div>
-      <div className="text-sm mt-1">{label}</div>
-    </div>
+      <Image src={icon} alt={title} width={20} height={20} className={`filter dark:invert ${isActive ? 'invert' : 'group-hover:invert'}`} />
+      <span className={`${isActive ? 'text-white' : 'text-blue-900 dark:text-white group-hover:text-white'} text-sm font-medium`}>{title}</span>
+    </button>
   );
 }

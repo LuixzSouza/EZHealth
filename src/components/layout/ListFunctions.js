@@ -1,4 +1,4 @@
-
+// Componentets
 import { ParagraphBlue } from "../theme/ParagraphBlue";
 import { CircleOrangeIcon } from "../theme/CircleOrangeIcon";
 

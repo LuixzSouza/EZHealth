@@ -3,32 +3,86 @@
 import { useState } from "react";
 import { HeadingOrange } from "../theme/HeadingOrange";
 import { ContainerGrid } from "../layout/ContainerGrid";
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+
+// Lista de médicos com usuário, senha, nome e foto
+const medicos = [
+  {
+    usuario: "joao",
+    senha: "1234",
+    nome: "Dr. João Silva",
+    foto: "/images/doctors/dr_joao_silva.png",
+    especialidade: "Clínico Geral"
+  },
+  {
+    usuario: "ana",
+    senha: "1234",
+    nome: "Dra. Ana Paula",
+    foto: "/images/doctors/dra_ana_paula.png",
+    especialidade: "Pediatra"
+  },
+  {
+    usuario: "marcos",
+    senha: "1234",
+    nome: "Dr. Marcos Vinícius",
+    foto: "/images/doctors/dr_marcos_vinicius.png",
+    especialidade: "Clínico Geral"
+  },
+  {
+    usuario: "camila",
+    senha: "1234",
+    nome: "Dra. Camila Ribeiro",
+    foto: "/images/doctors/dra_camila_ribeiro.png",
+    especialidade: "Pediatra"
+  },
+  {
+    usuario: "henrique",
+    senha: "1234",
+    nome: "Dr. Henrique Souza",
+    foto: "/images/doctors/dr_henrique_souza.png",
+    especialidade: "Clínico Geral"
+  },
+];
 
 export default function LoginMedico() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [medicoLogado, setMedicoLogado] = useState(null); // guarda o médico logado
   const router = useRouter();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Simulação de login simples
-    if (username === "medico" && password === "1234") {
-      setIsLoggedIn(true);
-      router.push('/painel-medico');
+
+    const medico = medicos.find(
+      (m) => m.usuario === username.toLowerCase() && m.senha === password
+    );
+    
+    if (medico) {
+      localStorage.setItem("medicoLogado", JSON.stringify(medico));
+      setMedicoLogado(medico);
+      // Enviar para a pagina
+      setTimeout(() => router.push('/painel-medico'), 2000);
     } else {
       alert("Usuário ou senha incorretos");
     }
   };
 
-  if (isLoggedIn) {
+  if (medicoLogado) {
     return (
-      <section className="py-14">
-        <ContainerGrid>
-          <HeadingOrange text={`Bem-vindo, Dr. ${username}`} />
-          <p className="text-blue-900 text-lg mt-4">Você acessou o painel médico com sucesso.</p>
-          {/* Aqui pode incluir os cards, botões e funcionalidades do médico */}
+      <section className="py-14 flex items-center justify-center px-4">
+        <ContainerGrid className="max-w-lg text-center flex flex-col items-center gap-6">
+          <HeadingOrange text={`Bem-vindo, ${medicoLogado.nome}`} />
+          <Image
+            src={medicoLogado.foto}
+            alt={medicoLogado.nome}
+            width={120}
+            height={120}
+            className="rounded-full shadow-md transition-all duration-700 opacity-0 animate-fade-in"
+          />
+          <p className="text-blue-900 dark:text-white text-lg">
+            Você acessou o painel médico com sucesso.
+          </p>
         </ContainerGrid>
       </section>
     );
@@ -39,30 +93,30 @@ export default function LoginMedico() {
       <ContainerGrid className="max-w-md bg-white dark:bg-themeDark shadow-xl rounded-2xl p-10 text-center shadow-black/10 dark:shadow-white/10">
         <HeadingOrange text="Login Médico" />
         <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-4 text-black text-lg">
-            <input
-                type="text"
-                placeholder="Usuário"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="border-2 border-orange rounded-md p-2 w-full bg-transparent dark:bg-white focus:outline-none focus:ring-2 focus:ring-orange"
-                required
-            />
-            <input
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="border-2 border-orange rounded-md p-2 w-full bg-transparent dark:bg-white focus:outline-none focus:ring-2 focus:ring-orange"
-                required
-            />
-            <button type="submit" className="bg-orange text-white py-2 rounded-lg hover:opacity-90">
-                Entrar
-            </button>
-            <div className="bg-orange/40 p-4 text-black dark:text-white" >
-                Teste <br/>
-                Usuario: medico <br/>
-                Senha: 1234
-            </div>
+          <input
+            type="text"
+            placeholder="Usuário"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="border-2 border-orange rounded-md p-2 w-full bg-transparent dark:bg-white focus:outline-none focus:ring-2 focus:ring-orange"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="border-2 border-orange rounded-md p-2 w-full bg-transparent dark:bg-white focus:outline-none focus:ring-2 focus:ring-orange"
+            required
+          />
+          <button type="submit" className="bg-orange text-white py-2 rounded-lg hover:opacity-90">
+            Entrar
+          </button>
+          <div className="bg-orange/40 p-4 text-black dark:text-white">
+            Teste:<br />
+            Usuários: joao, ana, marcos, camila, henrique<br />
+            Senha: 1234
+          </div>
         </form>
       </ContainerGrid>
     </section>

@@ -1,6 +1,9 @@
 'use client';
 
+// Next
 import Image from "next/image";
+
+// Componentes
 import { LinkMenu } from "./LinkMenu";
 
 export function Menu({ isOpen, onClose }) {

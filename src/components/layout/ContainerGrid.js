@@ -1,3 +1,4 @@
+// Imporação para utilizar tailwind no ContainerGrid
 import { twMerge } from "tailwind-merge"
 
 export function ContainerGrid({ children, className = "" }) {

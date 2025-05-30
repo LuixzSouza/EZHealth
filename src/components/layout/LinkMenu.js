@@ -1,6 +1,10 @@
 "use client";
+
+// Next - React
 import Link from "next/link";
 import { useRef } from "react";
+
+// GSAP/Animação
 import { gsap } from "gsap";
 
 export function LinkMenu({ children, link = "/", onClick }) {

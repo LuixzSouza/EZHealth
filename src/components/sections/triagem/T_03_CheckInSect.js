@@ -1,8 +1,8 @@
 'use client'
 
 import { ContainerGrid } from "@/components/layout/ContainerGrid";
-import { HeadingOrange } from "@/components/theme/HeadingOrange";
 import { ParagraphBlue } from "@/components/theme/ParagraphBlue";
+import { Heading } from "@/components/typography/Heading";
 import { useState } from "react";
 
 export function T_03_CheckInSect({ onNext }) {
@@ -20,7 +20,7 @@ export function T_03_CheckInSect({ onNext }) {
           }}
           className="w-full max-w-lg mt-8 bg-white/10 shadow-2xl rounded-2xl p-8 text-left space-y-5 text-black"
         >
-          <HeadingOrange text="CHECK - IN" />
+          <Heading as="h2" text="CHECK - IN" colorClass="dark:text-orangeDark text-orange" />
           <ParagraphBlue>
             Para começar, informe seus <span className="font-bold">dados pessoais</span> e, se tiver, o <span className="font-bold">número do convênio</span>. Assim, garantimos um atendimento ágil e sem burocracia.
           </ParagraphBlue>
@@ -71,7 +71,7 @@ export function T_03_CheckInSect({ onNext }) {
           {/* Sexo */}
           <div>
             <label className="text-orange font-semibold block mb-1">Sexo:</label>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 text-black dark:text-white">
               {['Masculino', 'Feminino', 'Outro', 'Prefiro não informar'].map((option) => (
                 <label key={option} className="inline-flex items-center gap-2">
                   <input
