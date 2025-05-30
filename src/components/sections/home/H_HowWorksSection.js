@@ -1,37 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
 import { ContainerGrid } from "../../layout/ContainerGrid";
 import { ListFunctions } from '../../layout/ListFunctions';
 import { Heading } from '@/components/typography/Heading';
 
-gsap.registerPlugin(ScrollTrigger);
-
 export function H_HowWorksSection() {
-  const itemsRef = useRef([]);
-
-  useEffect(() => {
-    itemsRef.current.forEach((item) => {
-      gsap.from(item, {
-        scrollTrigger: {
-          trigger: item,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        },
-        opacity: 0,
-        y: 50,
-        duration: 0.6,
-        ease: 'power3.out',
-      });
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, []);
 
   return (
     <section className="dark:bg-themeDark py-14 overflow-hidden" id="scomofunciona">
@@ -62,7 +35,6 @@ export function H_HowWorksSection() {
           ].map((item, index) => (
             <div
               key={index}
-              ref={(el) => (itemsRef.current[index] = el)}
             >
               <ListFunctions
                 img={item.img}

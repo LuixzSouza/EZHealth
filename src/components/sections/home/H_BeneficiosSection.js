@@ -1,12 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useState } from 'react';
+
 import { ContainerGrid } from '../../layout/ContainerGrid';
 import { Heading } from '@/components/typography/Heading';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const beneficios = [
   { titulo: 'Redução do tempo de espera', descricao: 'Check-in digital e triagem automatizada agilizam o atendimento.' },
@@ -18,31 +15,8 @@ const beneficios = [
 
 export function H_BeneficiosSection() {
   const [ativo, setAtivo] = useState(null);
-  const cardsRef = useRef([]);
 
   const toggle = (index) => setAtivo(ativo === index ? null : index);
-
-  useEffect(() => {
-    // para cada card, crie um ScrollTrigger
-    cardsRef.current.forEach((card) => {
-      gsap.from(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-        opacity: 0,
-        y: 50,
-        duration: 0.6,
-        ease: 'power3.out',
-      });
-    });
-
-    // limpa todos ao desmontar
-    return () => {
-      ScrollTrigger.getAll().forEach(st => st.kill());
-    };
-  }, []);
 
   return (
     <section className="dark:bg-themeDark py-14 overflow-hidden" id="sbeneficio">
@@ -54,7 +28,6 @@ export function H_BeneficiosSection() {
             <div
               key={index}
               // armazena a referência de cada card
-              ref={el => cardsRef.current[index] = el}
               className="w-full bg-orange text-white rounded-xl overflow-hidden transition-all duration-300"
             >
               <button

@@ -8,6 +8,8 @@ import { ParagraphBlue } from "../../theme/ParagraphBlue";
 import { ContainerGrid } from "../../layout/ContainerGrid";
 import { ScrollDown } from "../../utils/ScrollDown";
 import { Heading } from "@/components/typography/Heading";
+import { ButtonPrimary } from "@/components/theme/ButtonPrimary";
+import Link from "next/link";
 
 export function HeroSection() {
   const textRef = useRef(null);
@@ -48,6 +50,9 @@ export function HeroSection() {
           <ParagraphBlue>
             Bem-vindo ao <strong className="font-semibold">EZHealth</strong>, a triagem inteligente que agiliza o atendimento, reduz filas e otimiza o fluxo de pacientes em hospitais e consultórios.
           </ParagraphBlue>
+          <Link href={"/triagem"} >
+            <ButtonPrimary>Acessar Triagem</ButtonPrimary>
+          </Link>
         </div>
 
         <div

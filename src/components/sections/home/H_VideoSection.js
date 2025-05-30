@@ -38,7 +38,7 @@ export function H_VideoSection() {
                     {isPlaying && (
                         <video
                         className="w-full h-full object-contain rounded-3xl"
-                        src="https://www.w3schools.com/html/mov_bbb.mp4"
+                        src="/video/EZHealh_Video.mp4"
                         controls
                         autoPlay
                         onEnded={() => setIsPlaying(false)}
