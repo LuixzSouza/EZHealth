@@ -34,7 +34,7 @@ filas e otimiza recursos.
 - React.js
 - Next.js
 - recharts (Graficos)
-- next-intl (Linguagem)
+- next-intl (Linguagem) - Desenvolvimento
 
 ## Rodar o projeto:
 

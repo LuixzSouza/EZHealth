@@ -49,6 +49,7 @@ export default function LoginMedico() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [medicoLogado, setMedicoLogado] = useState(null); // guarda o médico logado
+  const [carregando, setCarregando] = useState(false);
   const router = useRouter();
 
   const handleLogin = (e) => {
@@ -60,6 +61,7 @@ export default function LoginMedico() {
     
     if (medico) {
       localStorage.setItem("medicoLogado", JSON.stringify(medico));
+      setCarregando(true);
       setMedicoLogado(medico);
       // Enviar para a pagina
       setTimeout(() => router.push('/painel-medico'), 2000);
@@ -68,21 +70,24 @@ export default function LoginMedico() {
     }
   };
 
-  if (medicoLogado) {
+  if (carregando && medicoLogado) {
     return (
-      <section className="py-14 flex items-center justify-center px-4">
-        <ContainerGrid className="max-w-lg text-center flex flex-col items-center gap-6">
+      <section className="py-14 flex items-center justify-center px-4 h-screen">
+        <ContainerGrid className="max-w-lg text-center flex flex-col items-center gap-6 animate-fade-in">
           <HeadingOrange text={`Bem-vindo, ${medicoLogado.nome}`} />
           <Image
             src={medicoLogado.foto}
             alt={medicoLogado.nome}
             width={120}
             height={120}
-            className="rounded-full shadow-md transition-all duration-700 opacity-0 animate-fade-in"
+            className="rounded-full shadow-md animate-pulse"
           />
-          <p className="text-blue-900 dark:text-white text-lg">
-            Você acessou o painel médico com sucesso.
+          <p className="text-blue-900 dark:text-white text-lg animate-fade-in">
+            Redirecionando para o painel médico...
           </p>
+
+          {/* Spinner animado */}
+          <div className="mt-4 border-4 border-orange border-t-transparent rounded-full w-12 h-12 animate-spin"></div>
         </ContainerGrid>
       </section>
     );
