@@ -10,9 +10,9 @@
   font-family: var(--font-montserrat);
 }
 
-/* html, body {
+ html {
   overflow-x: hidden;
-} */
+} 
 
 .dark body {
   @apply bg-themeDark text-white;

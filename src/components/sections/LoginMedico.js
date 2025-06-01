@@ -55,6 +55,19 @@ export default function LoginMedico() {
   const handleLogin = (e) => {
     e.preventDefault();
 
+    // Verificação especial para o administrador
+    if (username.toLowerCase() === 'admin' && password === '1234') {
+      const admin = {
+        nome: "Administrador",
+        usuario: "admin",
+        role: "admin"
+      };
+      localStorage.setItem("adminLogado", JSON.stringify(admin));
+      setCarregando(true);
+      setTimeout(() => router.push('/painel-admin'), 100);
+      return;
+    }
+    
     const medico = medicos.find(
       (m) => m.usuario === username.toLowerCase() && m.senha === password
     );
