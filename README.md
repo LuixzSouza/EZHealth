@@ -34,7 +34,11 @@ filas e otimiza recursos.
 - React.js
 - Next.js
 - recharts (Graficos)
-- next-intl (Linguagem) - Desenvolvimento
+- next-intl (Idiomas) - Ainda em Desenvolvimento
+- google-cloud - dialogflow (ChatBot)
+- uuid (Gera IDs de sessão)
+- Web Speech API (Tranforma audio em texto)
+- .env.local (Segurança)
 
 ## Rodar o projeto:
 

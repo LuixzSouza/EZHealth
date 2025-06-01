@@ -20,8 +20,8 @@ export function Header() {
     const pathname = usePathname();
 
     return(
-        <>
-            <header className="w-full sticky top-0 dark:bg-themeDark bg-white z-50 shadow-2xl shadow-black/10 dark:shadow-white/5" >
+        <div className="sticky top-0 z-50" >
+            <header className="w-full dark:bg-themeDark bg-white shadow-2xl shadow-black/10 dark:shadow-white/5 overflow-hidden" >
                 <ContainerGrid className="flex items-center justify-between" >
                     <div className="flex items-start justify-start" >
                         <Link href={"/#"} className="relative group" >
@@ -73,6 +73,6 @@ export function Header() {
                 setIsOpenSearch={setIsOpenSerach} 
                 setIsOpenMenu={setIsOpen} 
             />
-        </>
+        </div>
     )
 }

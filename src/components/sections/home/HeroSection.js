@@ -43,7 +43,7 @@ export function HeroSection() {
     <section className="dark:bg-themeDark relative w-full h-full overflow-hidden shadow-2xl shadow-black/10">
       <ContainerGrid className="flex flex-col items-center justify-between pt-14 lg:flex-row lg:pt-0">
         <div
-          className="w-full max-w-2xl flex flex-col gap-7 opacity-0 translate-y-6" // estado inicial se JS falhar
+          className="w-full max-w-2xl flex flex-col items-center text-center lg:items-start lg:text-start gap-7 opacity-0 translate-y-6 " // estado inicial se JS falhar
           ref={textRef}
         >
           <Heading as="h1" className="md:text-7xl" colorClass='dark:text-orangeDark text-orange' text='AGILIDADE E EFICIÊNCIA NA TRIAGEM MÉDICA'/>
