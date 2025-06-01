@@ -15,9 +15,14 @@ import { TriagensTab } from "@/components/sections/painelMedico/TriagensTab";
 import { ConfiguracoesTab } from "@/components/sections/painelMedico/ConfiguracoesTab";
 import { RelatoriosTab } from "@/components/sections/painelMedico/RelatoriosTab";
 
+// Importando os ícones que você usaria para abrir/fechar o menu em mobile
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"; // Certifique-se de ter @heroicons/react instalado
+
 export default function PainelMedico() {
   const [medico, setMedico] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Por padrão, a sidebar pode estar oculta em mobile e visível em desktop
+  // Ajustamos a lógica para mobile-first
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Começa fechado para mobile
   const [activeTab, setActiveTab] = useState('dashboard');
   const router = useRouter();
 
@@ -29,11 +34,27 @@ export default function PainelMedico() {
     } else {
       setMedico(JSON.parse(medicoLogado));
     }
+
+    // Lógica para abrir sidebar automaticamente em telas maiores
+    const handleResize = () => {
+      if (window.innerWidth >= 768) { // md breakpoint
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+
+    // Adiciona listener ao carregar e remove ao desmontar
+    window.addEventListener('resize', handleResize);
+    // Chama uma vez para definir o estado inicial
+    handleResize();
+
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   if (!medico) {
     return (
-      <div className="h-screen flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-themeDark text-DarkBlue dark:text-white">
         <p>Carregando painel...</p>
       </div>
     );
@@ -62,7 +83,18 @@ export default function PainelMedico() {
     <>
       <Header />
       <div className="flex min-h-screen">
-        <aside className={`bg-white dark:bg-white/10 w-64 p-6 space-y-6 shadow-md ${sidebarOpen ? 'block' : 'hidden'} md:block`}>
+        {/* Sidebar */}
+        <aside className={`
+          bg-white dark:bg-themeDark md:dark:bg-white/10 p-6 space-y-6 shadow-md
+          fixed inset-y-0 left-0 z-[51]  // Torna a sidebar fixa e sobreposta em mobile
+          w-64                            // Largura padrão para desktop
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} // Esconde/mostra em mobile
+          md:relative md:translate-x-0     // Em md e acima, volta a ser relativa e sempre visível
+          md:block                         // Assegura que em desktop ela sempre apareça
+          md:min-h-screen                  // Garante a altura em desktop
+          overflow-y-auto                  // Permite scroll se o conteúdo da sidebar for grande
+        `}>
           <div className="flex flex-col items-center">
             <Image
               src={medico.foto || "/icons/medico-avatar.svg"}
@@ -71,7 +103,7 @@ export default function PainelMedico() {
               alt="Avatar"
               className="rounded-full"
             />
-            <Heading as="h2" text={medico.nome} colorClass="text-DarkBlue dark:text-white" className="mt-4 md:text-lg" />
+            <Heading as="h2" text={medico.nome} colorClass="text-DarkBlue dark:text-white" className="mt-4 text-base md:text-lg" /> {/* Ajuste de fonte para mobile */}
             <p className="text-sm text-gray-500 text-center">{medico.especialidade}</p>
           </div>
 
@@ -87,7 +119,12 @@ export default function PainelMedico() {
                        tab === 'relatorios' ? 'Relatórios' : 'Configurações'}
                 tab={tab}
                 activeTab={activeTab}
-                onClick={setActiveTab}
+                onClick={() => {
+                  setActiveTab(tab);
+                  if (window.innerWidth < 768) { // Fecha a sidebar após clicar em mobile
+                    setSidebarOpen(false);
+                  }
+                }}
               />
             ))}
           </nav>
@@ -102,13 +139,33 @@ export default function PainelMedico() {
             <Image src="/icons/sair.svg" width={20} height={20} alt="Sair" />
             Sair
           </button>
-        </aside>
 
-        <main className="flex-1 p-6 bg-gray-50 dark:bg-themeDark">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="mb-4 md:hidden bg-blue-100 dark:bg-gray-700 text-blue-900 dark:text-white px-3 py-1 rounded"
+            className="mb-4 md:hidden bg-blue-100 dark:bg-gray-700 text-blue-900 dark:text-white px-3 py-2 rounded-lg flex items-center gap-2" // Ajuste de padding/arredondamento para mobile
           >
+            {sidebarOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
+            {sidebarOpen ? 'Fechar Menu' : 'Abrir Menu'}
+          </button>
+
+        </aside>
+
+        {/* Overlay para fechar sidebar em mobile */}
+        {sidebarOpen && window.innerWidth < 768 && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          ></div>
+        )}
+
+        {/* Conteúdo Principal */}
+        <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-themeDark"> {/* Ajuste de padding para mobile */}
+          {/* Botão de abrir/fechar menu para mobile */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="mb-4 md:hidden bg-blue-100 dark:bg-gray-700 text-blue-900 dark:text-white px-3 py-2 rounded-lg flex items-center gap-2" // Ajuste de padding/arredondamento para mobile
+          >
+            {sidebarOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
             {sidebarOpen ? 'Fechar Menu' : 'Abrir Menu'}
           </button>
 
@@ -123,11 +180,16 @@ function SidebarLink({ icon, title, tab, activeTab, onClick }) {
   const isActive = activeTab === tab;
   return (
     <button
-      onClick={() => onClick(tab)}
-      className={`flex items-center gap-3 px-3 py-2 rounded-md w-full text-left transition group ${isActive ? 'bg-orange dark:bg-orange' : 'hover:bg-orange/80 dark:hover:bg-gray/40'}`}
+      onClick={onClick}
+      className={`flex items-center gap-3 px-3 py-2 rounded-md w-full text-left transition group 
+                  ${isActive ? 'bg-orange dark:bg-orange' : 'hover:bg-orange/80 dark:hover:bg-gray-700'} 
+                  ${isActive ? 'text-white' : 'text-blue-900 dark:text-white group-hover:text-white'} 
+                  text-sm font-medium
+                  focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2 dark:focus:ring-offset-gray-800 // Acessibilidade
+                `}
     >
       <Image src={icon} alt={title} width={20} height={20} className={`filter dark:invert ${isActive ? 'invert' : 'group-hover:invert'}`} />
-      <span className={`${isActive ? 'text-white' : 'text-blue-900 dark:text-white group-hover:text-white'} text-sm font-medium`}>{title}</span>
+      <span>{title}</span>
     </button>
   );
 }

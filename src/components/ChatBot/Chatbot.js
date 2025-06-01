@@ -287,7 +287,7 @@ export default function Chatbot() {
           fixed bottom-6 right-6 w-16 h-16 
           bg-[#002157] dark:bg-themeDark dark:border dark:border-white text-white text-3xl 
           rounded-full flex items-center justify-center 
-          shadow-lg hover:bg-[#001f4d] z-50 overflow-hidden
+          shadow-lg hover:bg-[#001f4d] z-[55] overflow-hidden
           transition-all duration-300 ease-in-out
           ${isOpen ? 'rotate-45' : 'rotate-0'}
           focus:outline-none focus:ring-2 focus:ring-[#F47127] focus:ring-offset-2
@@ -303,7 +303,7 @@ export default function Chatbot() {
         ref={chatContainerRef}
         className={`
           fixed bottom-24 right-6 
-          w-full max-w-96 h-[600px] overflow-hidden
+          w-full max-w-[90vw] md:max-w-96 h-[65vh] overflow-hidden
           bg-white dark:bg-themeDark
           shadow-2xl rounded-2xl 
           flex flex-col

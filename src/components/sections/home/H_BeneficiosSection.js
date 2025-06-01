@@ -34,8 +34,8 @@ export function H_BeneficiosSection() {
                 onClick={() => toggle(index)}
                 className="w-full text-left px-6 py-4 flex justify-between items-center focus:outline-none"
               >
-                <span className="text-3xl font-semibold">{item.titulo}</span>
-                <span className="text-2xl">{ativo === index ? '−' : '+'}</span>
+                <span className="text-2xl md:text-3xl font-semibold">{item.titulo}</span>
+                <span className="text-base md:text-2xl">{ativo === index ? '−' : '+'}</span>
               </button>
               {ativo === index && (
                 <div className=" bg-white/30 px-6 py-4 text-white text-2xl">

@@ -39,3 +39,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+src/pages/api/bot/ezhealth-ia-5b587f5c5078.json

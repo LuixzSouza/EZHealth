@@ -65,7 +65,7 @@ export function H_ContactUsSection() {
 
             {/* Condicionalmente renderiza o botão ou o formulário */}
             {!formVisible ? (
-                <div className="w-full max-w-screen-sm flex flex-col items-center justify-center gap-6 bg-orange dark:bg-orange/70 p-10 rounded-md mt-14 z-10 lg:mb-0 h-96 text-center">
+                <div className="w-full max-w-screen-sm flex flex-col items-center justify-center gap-6 bg-orange dark:bg-orange/70 p-10 rounded-md mt-14 z-10 lg:mb-0 h-auto md:h-96 text-center">
                     <Heading
                         as="h3" // Usando h3 para ser um subtítulo visual
                         text="Interessado em Nossas Soluções?"

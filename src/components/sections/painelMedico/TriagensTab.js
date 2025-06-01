@@ -20,59 +20,61 @@ export function TriagensTab() {
   };
 
   return (
-    <div className="p-6 bg-white dark:bg-themeDark rounded-lg shadow-md">
+    <div className="p-4 sm:p-6 bg-white dark:bg-white/10 rounded-lg shadow-md"> {/* Ajuste de padding */}
       <Heading
         as="h2"
         text="Triagens Pendentes"
         colorClass="dark:text-orangeDark text-orange"
-        className="mb-4"
+        className="mb-3 text-2xl sm:text-3xl" // Ajuste de tamanho do título para mobile
       />
-      <ParagraphBlue className="mb-6">Pacientes aguardando triagem.</ParagraphBlue>
+      <ParagraphBlue className="mb-4 sm:mb-6 text-sm sm:text-base">Pacientes aguardando triagem.</ParagraphBlue> {/* Ajuste de margem e fonte */}
 
-      <div className="mb-6 text-right">
-        <ButtonPrimary onClick={handleNewTriagem}>
+      <div className="mb-4 sm:mb-6 text-right"> {/* Ajuste de margem */}
+        <ButtonPrimary onClick={handleNewTriagem}
+          className="w-full sm:w-auto" // Botão full width em mobile, automático em telas maiores
+        >
           + Nova Triagem Manual
         </ButtonPrimary>
       </div>
 
       {pendingTriagens.length > 0 ? (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-lg shadow"> {/* Adiciona arredondamento e sombra ao scroll container */}
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700"> {/* Ajuste dark mode para thead */}
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"> {/* Ajuste de padding e fonte */}
                   Paciente
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Urgência
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Tempo de Espera
                 </th>
-                <th scope="col" className="relative px-6 py-3">
+                <th scope="col" className="relative px-3 py-2 sm:px-6 sm:py-3">
                   <span className="sr-only">Ações</span>
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-white/10 divide-y divide-gray-200 dark:divide-gray-700">
               {pendingTriagens.map((triagem) => (
-                <tr key={triagem.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-DarkBlue dark:text-white">
+                <tr key={triagem.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"> {/* Adiciona hover effect */}
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-DarkBlue dark:text-white"> {/* Ajuste de padding */}
                     {triagem.patient}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      triagem.urgency === 'Alta' ? 'bg-red-100 text-red-800' :
-                      triagem.urgency === 'Média' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
+                      triagem.urgency === 'Alta' ? 'bg-red-100 text-red-800 dark:bg-red-700 dark:text-red-100' : // Ajuste dark mode para badges
+                      triagem.urgency === 'Média' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100' :
+                      'bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100'
                     }`}>
                       {triagem.urgency}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                     {triagem.timeWaiting}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleStartTriagem(triagem.id)}
                       className="underline text-orange-600 hover:text-orange-900 dark:text-orange dark:hover:text-orange/80 focus:outline-none"
@@ -86,7 +88,7 @@ export function TriagensTab() {
           </table>
         </div>
       ) : (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-8">Nenhuma triagem pendente no momento.</p>
+        <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">Nenhuma triagem pendente no momento.</p>
       )}
     </div>
   );

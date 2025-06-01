@@ -10,36 +10,38 @@ export function AgendaTab() {
   ];
 
   return (
-    <div className="p-6 bg-white dark:bg-white/10 rounded-lg shadow-md">
+    <div className="p-4 sm:p-6 bg-white dark:bg-white/10 rounded-lg shadow-md"> {/* Ajuste de padding */}
       <Heading
-        as="h2" // Define a tag HTML para o título
+        as="h2"
         text="Agenda de Consultas"
-        colorClass="dark:text-orangeDark text-orange" // Passa a classe de cor
-        className="mb-4" // Adiciona margem inferior
+        colorClass="dark:text-orangeDark text-orange"
+        className="mb-3 text-2xl sm:text-3xl" // Ajuste de tamanho do título para mobile
       />
-      <ParagraphBlue className="mb-6">Seus próximos compromissos.</ParagraphBlue>
+      <ParagraphBlue className="mb-4 sm:mb-6 text-sm sm:text-base">Seus próximos compromissos.</ParagraphBlue> {/* Ajuste de margem e fonte */}
 
       {/* Conteúdo da Agenda */}
       {appointments.length > 0 ? (
-        <ul className="space-y-4">
+        <ul className="space-y-3 sm:space-y-4"> {/* Ajuste de espaçamento entre itens */}
           {appointments.map((appointment) => (
-            <li key={appointment.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-md flex justify-between items-center">
-              <div>
-                <p className="text-lg font-semibold text-DarkBlue dark:text-white">
+            <li key={appointment.id} className="p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-md flex flex-col sm:flex-row justify-between sm:items-center"> {/* Ajuste de padding e flexbox para mobile */}
+              <div className="mb-2 sm:mb-0"> {/* Adiciona margem inferior em mobile */}
+                <p className="text-base sm:text-lg font-semibold text-DarkBlue dark:text-white leading-tight"> {/* Ajuste de fonte e line-height */}
                   {new Date(appointment.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })} - {appointment.time}
                 </p>
-                <p className="text-gray-600 dark:text-gray-400">{appointment.description}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.description}</p> {/* Ajuste de fonte */}
               </div>
               {/* Você pode adicionar botões de Ações aqui, ex: Ver Detalhes, Cancelar */}
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-8">Nenhum compromisso futuro agendado.</p>
+        <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">Nenhum compromisso futuro agendado.</p> 
       )}
 
-      <div className="mt-8 text-center">
-        <ButtonPrimary onClick={() => alert("Função para adicionar nova consulta!")} variant="primary">
+      <div className="mt-6 sm:mt-8 text-center"> {/* Ajuste de margem superior */}
+        <ButtonPrimary onClick={() => alert("Função para adicionar nova consulta!")} variant="primary"
+          className="w-full sm:w-auto" // Botão full width em mobile, automático em telas maiores
+        >
           + Adicionar Nova Consulta
         </ButtonPrimary>
       </div>

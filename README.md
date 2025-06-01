@@ -38,6 +38,7 @@ filas e otimiza recursos.
 - google-cloud - dialogflow (ChatBot)
 - uuid (Gera IDs de sessão)
 - Web Speech API (Tranforma audio em texto)
+- heroicons/react (Icones)
 - .env.local (Segurança)
 
 ## Rodar o projeto:
