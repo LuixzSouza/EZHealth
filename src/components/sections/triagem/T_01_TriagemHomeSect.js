@@ -67,17 +67,22 @@ export function T_01_TriagemHomeSect({ onStart }) {
               width={400}
               height={400}
               alt="Avatar"
-              className="rounded-3xl shadow-xl transition-transform duration-300 hover:scale-105"
+              className="rounded-3xl shadow-xl shadow-black/10 dark:shadow-white/10 transition-transform duration-300 hover:scale-105"
             />
-            <div
-              className={`
-                absolute top-0 left-full ml-4 w-full max-w-lg p-4 bg-orange text-white rounded-lg shadow-lg
-                transition-all duration-500 ease-out pointer-events-none
-                ${isHovered ? "opacity-100 scale-100 translate-x-0" : "opacity-0 scale-95 -translate-x-20"}
-              `}
-            >
-              {typedText}
-            </div>
+          <div
+            className={`
+              absolute top-1/2 left-0 lg:top-0 lg:left-full ml-4 w-full lg:max-w-lg p-4 bg-orange text-white 
+              rounded-lg rounded-tl-lg lg:rounded-tl-none lg:rounded-bl-lg shadow-lg
+              transition-all duration-500 ease-out pointer-events-none
+              ${isHovered 
+                ? "opacity-100 scale-100 translate-y-0 lg:translate-x-0" 
+                : "opacity-0 scale-95 -translate-y-10 lg:translate-y-0 lg:-translate-x-10"
+              }
+            `}
+          >
+            {typedText}
+          </div>
+
           </div>
 
           {/* Heading e botão */}

@@ -18,8 +18,8 @@ export default function Message({
   const bubbleColor = isUser
     ? 'bg-orange/90 text-white rounded-br-none'
     : isError
-    ? 'bg-red-200 text-red-800 rounded-bl-none border border-red-500'
-    : 'bg-DarkBlue text-white dark:bg-themeDark dark:bg-gray-700 dark:text-white rounded-bl-none';
+    ? 'bg-red-200 text-red-800 rounded-tl-none border border-red-500'
+    : 'bg-DarkBlue text-white dark:bg-themeDark dark:bg-gray-700 dark:text-white rounded-tl-none';
 
   return (
     <div className={containerClasses}>
@@ -47,15 +47,25 @@ export default function Message({
             onToggleContext(idx);
           }}
           className="
-            absolute -bottom-2 -right-2 p-1 bg-white rounded-full
-            text-gray-400 hover:text-gray-600 transition-all duration-200
-            opacity-0 group-hover:opacity-100 scale-0 group-hover:scale-100
-            shadow-md z-10 flex items-center justify-center
+            absolute -bottom-2 -right-2 p-2 bg-white rounded-full shadow-md
+            text-black hover:text-orange hover:bg-slate-200
+            opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100
+            transition-all duration-200 ease-in-out
+            focus:outline-none focus:ring-2 focus:ring-orange
+            z-10
           "
-          aria-label="Opções da mensagem"
-          title="Opções da mensagem"
+          aria-label="Abrir opções da mensagem"
+          title="Abrir opções da mensagem"
         >
-          ⋮
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v.01M12 12v.01M12 18v.01" />
+          </svg>
         </button>
 
         {isOpenContext === idx && (

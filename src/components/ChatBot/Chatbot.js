@@ -1,3 +1,5 @@
+// Chatbot.jsx
+
 'use client';
 
 import React, {
@@ -23,6 +25,7 @@ export default function Chatbot() {
   const [openContextIdx, setOpenContextIdx] = useState(null);
   const [suggestionsOpen, setSuggestionsOpen] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
+  const [replyTo, setReplyTo] = useState(null);
 
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -173,11 +176,21 @@ export default function Chatbot() {
       const trimmed = inputMessage.trim();
       if (!trimmed) return;
 
-      const userMsg = { text: trimmed, sender: 'user' };
+      // Cria objeto de mensagem do usuário
+      const userMsg = {
+        text: trimmed,
+        sender: 'user',
+        replyTo: replyTo ? { ...replyTo } : null,
+        pinned: false,
+        favorite: false,
+        liked: false,
+      };
+
       setMessages(prev => [...prev, userMsg]);
       setInputMessage('');
       setLoading(true);
       setOpenContextIdx(null);
+      setReplyTo(null);
 
       try {
         const response = await fetch('/api/bot/dialogflow', {
@@ -215,7 +228,7 @@ export default function Chatbot() {
         setLoading(false);
       }
     },
-    [inputMessage, sessionId]
+    [inputMessage, sessionId, replyTo]
   );
 
   // Ações do menu de contexto
@@ -232,19 +245,33 @@ export default function Chatbot() {
         setMessages(prev => prev.filter((_, i) => i !== idx));
         break;
       case 'reply':
-        alert(`↩️ Implementar função “responder” para: "${message.text}"`);
+        setReplyTo({ text: message.text, sender: message.sender, idx });
+        setTimeout(() => inputRef.current?.focus(), 0);
         break;
       case 'react':
-        alert(`👍 Implementar função “reagir” para: "${message.text}"`);
+        setMessages(prev =>
+          prev.map((m, i) =>
+            i === idx ? { ...m, liked: !m.liked } : m
+          )
+        );
         break;
       case 'forward':
-        alert(`🔄 Implementar função “encaminhar” para: "${message.text}"`);
+        setInputMessage(`Fwd: ${message.text}`);
+        setTimeout(() => inputRef.current?.focus(), 0);
         break;
       case 'pin':
-        alert(`📌 Implementar função “fixar” para: "${message.text}"`);
+        setMessages(prev =>
+          prev.map((m, i) =>
+            i === idx ? { ...m, pinned: !m.pinned } : m
+          )
+        );
         break;
       case 'favorite':
-        alert(`⭐ Implementar função “favoritar” para: "${message.text}"`);
+        setMessages(prev =>
+          prev.map((m, i) =>
+            i === idx ? { ...m, favorite: !m.favorite } : m
+          )
+        );
         break;
       default:
         break;
@@ -284,7 +311,7 @@ export default function Chatbot() {
       <button
         onClick={() => setIsOpen(prev => !prev)}
         className={`
-          fixed bottom-6 right-6 w-16 h-16 
+          fixed bottom-6 right-6 w-16 h-16
           bg-[#002157] dark:bg-themeDark dark:border dark:border-white text-white text-3xl 
           rounded-full flex items-center justify-center 
           shadow-lg hover:bg-[#001f4d] z-[55] overflow-hidden
@@ -302,15 +329,15 @@ export default function Chatbot() {
       <div
         ref={chatContainerRef}
         className={`
-          fixed bottom-24 right-6 
+          fixed bottom-6 right-6 lg:bottom-24
           w-full max-w-[90vw] md:max-w-96 h-[65vh] overflow-hidden
           bg-white dark:bg-themeDark
-          shadow-2xl rounded-2xl 
+          shadow-2xl rounded-2xl shadow-black/50 dark:shadow-white/30
           flex flex-col
           transform origin-bottom-right
           transition-all duration-300 ease-in-out
           ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'}
-          z-40
+          z-[56]
         `}
       >
         {/* Cabeçalho */}
@@ -389,6 +416,18 @@ export default function Chatbot() {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Se estiver respondendo, mostrar mensagem que está sendo respondida */}
+        {replyTo && (
+          <div className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 flex justify-between items-center">
+            <div className="flex-1 truncate">
+              Respondendo a: {replyTo.text}
+            </div>
+            <button onClick={() => setReplyTo(null)} className="ml-2 text-red-500 hover:text-red-700">
+              ✖️
+            </button>
+          </div>
+        )}
+
         {/* Sugestões de frases (quando o input está vazio e não está carregando) */}
         {!inputMessage && !loading && messages.length > 0 && (
           <div className="relative z-10 flex flex-col items-center bg-DarkBlue dark:bg-themeDark p-2">
@@ -443,93 +482,95 @@ export default function Chatbot() {
         {/* Input de mensagem + botões extras */}
         <form
           onSubmit={sendMessage}
-          className="flex p-3 border-t border-gray-300 dark:border-gray-700 bg-[#EBEDEF] dark:bg-white/10 z-20"
+          className="flex flex-col"
         >
-          <div className="flex items-center space-x-2">
-            {/* Botão de microfone */}
+          <div className="flex p-3 border-t border-gray-300 dark:border-gray-700 bg-[#EBEDEF] dark:bg-white/10 z-20">
+            <div className="flex items-center space-x-2">
+              {/* Botão de microfone */}
+              <button
+                type="button"
+                onClick={toggleRecording}
+                className={`
+                  p-2 rounded-full 
+                  ${isRecording
+                    ? 'bg-red-500 dark:bg-red-700'
+                    : 'bg-gray-200 dark:bg-gray-600'} 
+                  text-gray-800 dark:text-gray-200 
+                  hover:bg-gray-300 dark:hover:bg-gray-500
+                  transition-colors focus:outline-none
+                `}
+                aria-label={isRecording ? 'Parar gravação' : 'Iniciar gravação'}
+                title={isRecording ? 'Parar gravação' : 'Iniciar gravação'}
+              >
+                {isRecording ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 1v4m0 0a4 4 0 014 4v4m0 0a4 4 0 01-4 4m0 0a4 4 0 01-4-4V9m0 0a4 4 0 014-4m0 0V1m0 16v4m-4-2h8"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 1v4m0 0a4 4 0 014 4v4m0 0a4 4 0 01-4 4m0-12a4 4 0 00-4 4v4a4 4 0 004 4m0-12V1m0 16v4m4-2h-8"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
+
+            {/* Substituímos <input> por <textarea> com auto-resize até 3 linhas */}
+            <textarea
+              ref={inputRef}
+              value={inputMessage}
+              onChange={e => setInputMessage(e.target.value)}
+              onInput={e => {
+                e.target.style.height = 'auto';
+                e.target.style.height = `${e.target.scrollHeight}px`;
+              }}
+              rows={1}
+              placeholder="Digite sua mensagem..."
+              className="
+                flex-1 mx-2 px-3 py-2 
+                border border-gray-400 dark:border-gray-600
+                rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47127] dark:focus:ring-[#F47127]
+                bg-white dark:bg-white/80 dark:bg-gray-700 text-black
+                placeholder-gray-500 dark:placeholder-gray-400 shadow-inner
+                resize-none overflow-y-auto max-h-[4.5rem]
+              "
+              disabled={loading}
+              spellCheck={true}
+            />
+
             <button
-              type="button"
-              onClick={toggleRecording}
-              className={`
-                p-2 rounded-full 
-                ${isRecording
-                  ? 'bg-red-500 dark:bg-red-700'
-                  : 'bg-gray-200 dark:bg-gray-600'} 
-                text-gray-800 dark:text-gray-200 
-                hover:bg-gray-300 dark:hover:bg-gray-500
-                transition-colors focus:outline-none
-              `}
-              aria-label={isRecording ? 'Parar gravação' : 'Iniciar gravação'}
-              title={isRecording ? 'Parar gravação' : 'Iniciar gravação'}
+              type="submit"
+              className="
+                bg-[#F47127] text-white px-4 py-2 rounded-lg
+                hover:bg-[#FF6B00] disabled:opacity-50 disabled:cursor-not-allowed
+                transition-all duration-200
+              "
+              disabled={loading}
             >
-              {isRecording ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 1v4m0 0a4 4 0 014 4v4m0 0a4 4 0 01-4 4m0 0a4 4 0 01-4-4V9m0 0a4 4 0 014-4m0 0V1m0 16v4m-4-2h8"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 1v4m0 0a4 4 0 014 4v4m0 0a4 4 0 01-4 4m0-12a4 4 0 00-4 4v4a4 4 0 004 4m0-12V1m0 16v4m4-2h-8"
-                  />
-                </svg>
-              )}
+              Enviar
             </button>
           </div>
-
-          {/* Substituímos <input> por <textarea> com auto-resize até 3 linhas */}
-          <textarea
-            ref={inputRef}
-            value={inputMessage}
-            onChange={e => setInputMessage(e.target.value)}
-            onInput={e => {
-              e.target.style.height = 'auto';
-              e.target.style.height = `${e.target.scrollHeight}px`;
-            }}
-            rows={1}
-            placeholder="Digite sua mensagem..."
-            className="
-              flex-1 mx-2 px-3 py-2 
-              border border-gray-400 dark:border-gray-600
-              rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47127] dark:focus:ring-[#F47127]
-              bg-white dark:bg-white/80 dark:bg-gray-700 text-black
-              placeholder-gray-500 dark:placeholder-gray-400 shadow-inner
-              resize-none overflow-y-auto max-h-[4.5rem]
-            "
-            disabled={loading}
-            spellCheck={true}
-          />
-
-          <button
-            type="submit"
-            className="
-              bg-[#F47127] text-white px-4 py-2 rounded-lg
-              hover:bg-[#FF6B00] disabled:opacity-50 disabled:cursor-not-allowed
-              transition-all duration-200
-            "
-            disabled={loading}
-          >
-            Enviar
-          </button>
         </form>
       </div>
     </div>
