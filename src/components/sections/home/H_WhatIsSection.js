@@ -15,34 +15,41 @@ export function H_WhatIsSection() {
   const imageRef = useRef(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(textRef.current, {
-        scrollTrigger: {
-          trigger: textRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-        opacity: 0,
-        x: -50,
-        duration: 1,
-        ease: 'power3.out',
+    if (typeof window !== "undefined" && window.innerWidth >= 768) {
+      const ctx = gsap.context(() => {
+        gsap.from(textRef.current, {
+          scrollTrigger: {
+            trigger: textRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+          },
+          opacity: 0,
+          x: -50,
+          duration: 1,
+          ease: 'power3.out',
+        });
+
+        gsap.from(imageRef.current, {
+          scrollTrigger: {
+            trigger: imageRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+          },
+          opacity: 0,
+          x: 50,
+          duration: 1,
+          delay: 0.2,
+          ease: 'power3.out',
+        });
       });
 
-      gsap.from(imageRef.current, {
-        scrollTrigger: {
-          trigger: imageRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-        opacity: 0,
-        x: 50,
-        duration: 1,
-        delay: 0.2,
-        ease: 'power3.out',
-      });
-    });
-
-    return () => ctx.revert(); // limpa ao desmontar
+      return () => ctx.revert(); // limpa ao desmontar
+    } else {
+      // Para mobile: mostra o conteúdo sem animação
+      if (textRef.current && imageRef.current) {
+        gsap.set([textRef.current, imageRef.current], { opacity: 1, x: 0 });
+      }
+    }
   }, []);
 
   return (

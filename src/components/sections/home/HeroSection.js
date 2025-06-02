@@ -15,10 +15,11 @@ export function HeroSection() {
   const textRef = useRef(null);
   const imageRef = useRef(null);
 
-  useEffect(() => {
+useEffect(() => {
+  if (typeof window !== "undefined" && window.innerWidth >= 768) {
     const tl = gsap.timeline();
 
-    tl.set([textRef.current, imageRef.current], { autoAlpha: 0 }) // invisível inicialmente
+    tl.set([textRef.current, imageRef.current], { autoAlpha: 0 })
 
       .to(textRef.current, {
         autoAlpha: 1,
@@ -35,9 +36,15 @@ export function HeroSection() {
           duration: 1,
           ease: "power3.out",
         },
-        "-=0.5" // começa antes da anterior terminar
+        "-=0.5"
       );
-  }, []);
+  } else {
+    // Se for mobile, garantir que fique visível sem animação
+    if (textRef.current && imageRef.current) {
+      gsap.set([textRef.current, imageRef.current], { autoAlpha: 1, x: 0, y: 0 });
+    }
+  }
+}, []);
 
   return (
     <section className="dark:bg-themeDark relative w-full h-full overflow-hidden shadow-2xl shadow-black/10">
