@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import Message from './Message';
 import ContextMenu from './ContextMenu';
-import Suggestions from './Suggestions';
+import Suggestions from './Suggestions'; // Make sure this path is correct
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([]);
@@ -26,6 +26,7 @@ export default function Chatbot() {
   const [suggestionsOpen, setSuggestionsOpen] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
+  const [displayedSuggestions, setDisplayedSuggestions] = useState([]); // New state for displayed suggestions
 
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -33,13 +34,35 @@ export default function Chatbot() {
   const recognitionRef = useRef(null);
 
   // Sugestões iniciais
-  const initialSuggestions = useRef([
-    'Quais os sintomas da gripe?',
-    'Como agendar uma consulta?',
-    'Onde fica a clínica mais próxima?',
-    'Dicas para uma alimentação saudável',
-    'Qual o telefone de contato?',
+  const allInitialSuggestions = useRef([
+    'Como faço a triagem agora?',
+    'Queria uma consulta com o médico',
+    'Me explica o que fazer aqui',
+    'Estou com problemas no login',
+    'Quais são os diferenciais?',
+    'Me explica o processo do EZHealth.',
+    'Como entro em contato?',
+    'Oi, Dr. EzHealth!',
+    'Explique o EZHealth',
+    'Como funciona a parte de emergência?',
+    'O que recebo depois da triagem?',
+    'Como é o check-in digital?',
+    'O formulário é inteligente?',
+    'Posso mudar o layout?',
+    'Já terminei a triagem, e agora?',
+    'Me sentindo mal, com enjoo',
   ]).current;
+
+  // --- Função para gerar sugestões aleatórias ---
+  const generateRandomSuggestions = useCallback(() => {
+    const shuffled = [...allInitialSuggestions].sort(() => 0.5 - Math.random());
+    setDisplayedSuggestions(shuffled.slice(0, 3)); // Limita a 3 sugestões
+  }, [allInitialSuggestions]);
+
+  // Inicializa as sugestões ao carregar o componente
+  useEffect(() => {
+    generateRandomSuggestions();
+  }, [generateRandomSuggestions]);
 
   // --- Inicialização do SpeechRecognition ---
   useEffect(() => {
@@ -296,8 +319,9 @@ export default function Chatbot() {
           sender: 'bot',
         },
       ]);
+      generateRandomSuggestions(); // Regenerate suggestions after clearing chat
     }
-  }, []);
+  }, [generateRandomSuggestions]);
 
   // Preenche input ao clicar em sugestão
   const handleSuggestionClick = useCallback((sug) => {
@@ -440,10 +464,10 @@ export default function Chatbot() {
                 border border-white
                 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 
                 transition-transform duration-200 
-                ${suggestionsOpen ? 'rotate-0' : 'rotate-180'}
+                ${suggestionsOpen ? 'rotate-180' : 'rotate-0'}
               `}
-              aria-label={suggestionsOpen ? 'Fechar sugestões' : 'Abrir sugestões'}
-              title={suggestionsOpen ? 'Fechar sugestões' : 'Abrir sugestões'}
+              aria-label={suggestionsOpen ? 'Abrir sugestões' : 'Fechar sugestões'}
+              title={suggestionsOpen ? 'Abrir sugestões' : 'Fechar sugestões'}
             >
               {/* Ícone de setinha */}
               <svg
@@ -467,13 +491,14 @@ export default function Chatbot() {
                 w-full overflow-hidden
                 transition-[max-height,opacity] duration-300 ease-in-out
                 ${suggestionsOpen
-                  ? 'max-h-[200px] opacity-100'
-                  : 'max-h-0 opacity-0'}
+                  ? 'max-h-0 opacity-0'
+                  : 'max-h-48 opacity-100'}
               `}
             >
               <Suggestions
-                suggestions={initialSuggestions}
+                suggestions={displayedSuggestions} // Pass the dynamically managed suggestions
                 onClick={handleSuggestionClick}
+                onGenerateNew={generateRandomSuggestions} // Pass the new function
               />
             </div>
           </div>

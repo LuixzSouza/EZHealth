@@ -4,11 +4,13 @@ import { ParagraphBlue } from '@/components/theme/ParagraphBlue';
 import { Heading } from '@/components/typography/Heading';
 import { useForm } from 'react-hook-form';
 
-export function T_05_SymptomsDirector({ onNext }) {
-  const { register, handleSubmit } = useForm();
+export function T_05_SymptomsDirector({ onNext, defaultValues }) {
 
-  const onSubmit = (vals) => {
-    onNext(vals);
+  const { register, handleSubmit } = useForm({ defaultValues });
+
+  const onSubmit = (data) => {
+    // Passa todos os dados do formulário para a função onNext
+    onNext(data);
   };
 
   const symptomOptions = [
@@ -34,15 +36,19 @@ export function T_05_SymptomsDirector({ onNext }) {
           Descreva com suas palavras ou selecione uma ou mais opções abaixo:
         </ParagraphBlue>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           {symptomOptions.map((symptom) => (
-            <label key={symptom.name} className="inline-flex items-center gap-2">
+            <label
+              key={symptom.name}
+              className="flex items-center gap-3 p-3 border border-gray-300 rounded-md cursor-pointer transition-all
+                        hover:border-orange peer-checked:border-orange peer-checked:bg-orange peer-checked:text-white text-black dark:text-white"
+            >
               <input
                 type="checkbox"
                 {...register(`sintomas.${symptom.name}`)}
-                className="accent-orange"
+                className="peer accent-orange w-5 h-5"
               />
-              <span className="text-gray-800">{symptom.label}</span>
+              <span className="text-base">{symptom.label}</span>
             </label>
           ))}
 

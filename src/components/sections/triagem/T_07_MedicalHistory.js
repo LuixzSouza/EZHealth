@@ -4,10 +4,12 @@ import { ParagraphBlue } from '@/components/theme/ParagraphBlue';
 import { Heading } from '@/components/typography/Heading';
 import { useForm } from 'react-hook-form';
 
-export function T_07_MedicalHistory({ onNext }) {
-  const { register, handleSubmit } = useForm();
+export function T_07_MedicalHistory({ onNext, defaultValues }) {
+
+  const { register, handleSubmit } = useForm({ defaultValues });
 
   const onSubmit = (data) => {
+    // Passa todos os dados do formulário para a função onNext
     onNext(data);
   };
 
@@ -27,21 +29,31 @@ export function T_07_MedicalHistory({ onNext }) {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white/10 shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"
       >
-        <Heading as="h2" text="Histórico Médico" colorClass="dark:text-orangeDark text-orange" className='md:text-3xl' />
-        
+        <Heading
+          as="h2"
+          text="Histórico Médico"
+          colorClass="dark:text-orangeDark text-orange"
+          className="md:text-3xl"
+        />
+
         <ParagraphBlue>
           Alguma das condições abaixo se aplica a você?
         </ParagraphBlue>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           {historyOptions.map((item) => (
-            <label key={item.name} className="inline-flex items-center gap-2">
+            <label
+              key={item.name}
+              className="flex items-center gap-3 p-3 border border-gray-300 rounded-md cursor-pointer transition-all
+                        hover:border-orange text-black dark:text-white
+                        peer-checked:border-orange peer-checked:bg-orange peer-checked:text-white"
+            >
               <input
                 type="checkbox"
                 {...register(`historico.${item.name}`)}
-                className="accent-orange"
+                className="peer w-6 h-6 accent-orange"
               />
-              <span className="text-gray-800">{item.label}</span>
+              <span className="text-base">{item.label}</span>
             </label>
           ))}
         </div>

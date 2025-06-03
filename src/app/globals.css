@@ -10,7 +10,7 @@
   font-family: var(--font-montserrat);
 }
 
- html {
+ html, body {
   overflow-x: hidden;
 } 
 

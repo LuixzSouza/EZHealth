@@ -4,10 +4,12 @@ import { ParagraphBlue } from '@/components/theme/ParagraphBlue';
 import { Heading } from '@/components/typography/Heading';
 import { useForm } from 'react-hook-form';
 
-export function T_06_SymptomDuration({ onNext }) {
-  const { register, handleSubmit } = useForm();
+export function T_06_SymptomDuration({ onNext, defaultValues }) {
+
+  const { register, handleSubmit } = useForm({ defaultValues });
 
   const onSubmit = (data) => {
+    // Passa todos os dados do formulário para a função onNext
     onNext(data);
   };
 
@@ -24,7 +26,12 @@ export function T_06_SymptomDuration({ onNext }) {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white/10 shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"
       >
-        <Heading as="h2" text="Tempo dos Sintomas" colorClass="dark:text-orangeDark text-orange" className='md:text-3xl' />
+        <Heading
+          as="h2"
+          text="Tempo dos Sintomas"
+          colorClass="dark:text-orangeDark text-orange"
+          className="md:text-3xl"
+        />
 
         <ParagraphBlue>
           Há quanto tempo os sintomas começaram?
@@ -32,14 +39,19 @@ export function T_06_SymptomDuration({ onNext }) {
 
         <div className="flex flex-col gap-3">
           {durationOptions.map((option) => (
-            <label key={option.value} className="inline-flex items-center gap-2">
+            <label
+              key={option.value}
+              className="flex items-center gap-3 p-3 border border-gray-300 rounded-md cursor-pointer transition-all
+                        hover:border-orange text-black dark:text-white
+                        peer-checked:border-orange peer-checked:bg-orange peer-checked:text-white"
+            >
               <input
                 type="radio"
                 value={option.value}
-                {...register('tempoSintomas', { required: true })}
-                className="accent-orange"
+                {...register('sintomasDetalhes.tempoSintomas', { required: true })}
+                className="peer w-6 h-6 accent-orange"
               />
-              <span className="text-gray-800">{option.label}</span>
+              <span className="text-base">{option.label}</span>
             </label>
           ))}
         </div>

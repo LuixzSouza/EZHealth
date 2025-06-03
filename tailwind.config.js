@@ -18,6 +18,9 @@ module.exports = {
       },
       height: {
         580: '36.25rem'
+      },
+      backgroundImage: {
+        videoMockup: 'url("/images/mockup-video.png")'
       }
     },
   },
