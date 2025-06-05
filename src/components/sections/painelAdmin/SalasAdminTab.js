@@ -72,7 +72,7 @@ export function SalasAdminTab() {
     }
     setErrorSalas(null);
     try {
-      const resp = await fetch("/api/salas"); // Caminho relativo
+      const resp = await fetch("https://ezhealthluixz.netlify.app/api/salas"); // Caminho relativo
       if (!resp.ok) {
         throw new Error(`Erro ao buscar salas! Status: ${resp.status}`);
       }
@@ -92,7 +92,7 @@ export function SalasAdminTab() {
 
   const fetchDoctors = useCallback(async () => { // Envolvido em useCallback
     try {
-      const resp = await fetch("/api/medicos"); // Caminho relativo
+      const resp = await fetch("https://ezhealthluixz.netlify.app/api/medicos"); // Caminho relativo
       if (!resp.ok) {
         throw new Error(`Erro ao buscar médicos! Status: ${resp.status}`);
       }
@@ -108,7 +108,7 @@ export function SalasAdminTab() {
     try {
       // Assumindo que /api/patients retorna uma lista de pacientes com { id, name }
       // Se a estrutura for diferente, ajuste o mapeamento ou o uso de getPatientName
-      const resp = await fetch("/api/patients"); // Caminho relativo
+      const resp = await fetch("https://ezhealthluixz.netlify.app/api/patients"); // Caminho relativo
       if (!resp.ok) {
         throw new Error(`Erro ao buscar pacientes! Status: ${resp.status}`);
       }
@@ -165,14 +165,14 @@ export function SalasAdminTab() {
 
       if (currentRoom && currentRoom.id) { // Editando uma sala existente
         // Para PUT, envia o ID na query string
-        resp = await fetch(`/api/salas?id=${currentRoom.id}`, {
+        resp = await fetch(`https://ezhealthluixz.netlify.app/salas?id=${currentRoom.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dataToSend), // Envia apenas os dados atualizáveis
         });
         successMessage = "Sala atualizada com sucesso!";
       } else { // Adicionando uma nova sala
-        resp = await fetch("/api/salas", { // Caminho relativo
+        resp = await fetch("https://ezhealthluixz.netlify.app/api/salas", { // Caminho relativo
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dataToSend),
@@ -204,7 +204,7 @@ export function SalasAdminTab() {
     setConfirmMessage("Tem certeza que deseja excluir esta sala? Esta ação é irreversível e pode desocupar médico e paciente dela, se aplicável.");
     setConfirmAction(() => async () => {
       try {
-        const resp = await fetch(`/api/salas?id=${roomId}`, { // Caminho relativo e ID na query
+        const resp = await fetch(`https://ezhealthluixz.netlify.app/api/salas?id=${roomId}`, { // Caminho relativo e ID na query
           method: "DELETE"
         });
 

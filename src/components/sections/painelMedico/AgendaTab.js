@@ -42,7 +42,7 @@ export function AgendaTab() {
             setError(null);
 
             // A URL já está correta para filtrar
-            const response = await fetch(`/api/agenda?medicoNome=${encodeURIComponent(nomeDoMedico)}`);
+            const response = await fetch(`https://ezhealthluixz.netlify.app/api/agenda?medicoNome=${encodeURIComponent(nomeDoMedico)}`);
 
             if (!response.ok) {
                 throw new Error(`Erro HTTP! status: ${response.status}`);
@@ -106,7 +106,7 @@ export function AgendaTab() {
                 // Opcional: status da consulta (agendada, confirmada, realizada, cancelada)
             };
 
-            const response = await fetch('/api/agenda', {
+            const response = await fetch('https://ezhealthluixz.netlify.app/api/agenda', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

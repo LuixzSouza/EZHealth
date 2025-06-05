@@ -88,7 +88,7 @@ export function ConfiguracoesTab() {
     };
 
     try {
-      const response = await fetch('/api/user-settings', {
+      const response = await fetch('https://ezhealthluixz.netlify.app/api/user-settings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

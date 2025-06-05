@@ -18,7 +18,7 @@ export function PacientesTab() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`/api/triagem`, {
+        const response = await fetch(`https://ezhealthluixz.netlify.app/api/triagem`, {
           cache: "no-store",
         });
 

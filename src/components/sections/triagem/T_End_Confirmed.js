@@ -26,7 +26,7 @@ export function T_End_Confirmed({ formData }) {
       const timer = setTimeout(async () => {
         try {
           // CORREÇÃO AQUI: Usando caminho relativo para a API de triagem
-          const response = await fetch("/api/triagem", {
+          const response = await fetch("https://ezhealthluixz.netlify.app/api/triagem", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData),

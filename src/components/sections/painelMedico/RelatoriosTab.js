@@ -15,7 +15,7 @@ export function RelatoriosTab() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/reports'); // Chamada para a nova API de listagem de relatórios
+      const response = await fetch('https://ezhealthluixz.netlify.app/api/reports'); // Chamada para a nova API de listagem de relatórios
       if (!response.ok) {
         throw new Error(`Erro HTTP! status: ${response.status}`);
       }

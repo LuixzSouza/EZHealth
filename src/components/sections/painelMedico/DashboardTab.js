@@ -336,7 +336,7 @@ export function DashboardTab() {
         setLoadingStats(true);
         setErrorStats(null);
 
-        const resp = await fetch('/api/dashboard-stats');
+        const resp = await fetch('https://ezhealthluixz.netlify.app/api/dashboard-stats');
         if (!resp.ok) {
           throw new Error(`Erro HTTP: ${resp.status}`);
         }
@@ -364,7 +364,7 @@ export function DashboardTab() {
         setLoadingConsultas(true);
         setErrorConsultas(null);
 
-        const resp = await fetch('/api/consultas-por-mes');
+        const resp = await fetch('https://ezhealthluixz.netlify.app/api/consultas-por-mes');
         if (!resp.ok) {
           throw new Error(`Erro HTTP: ${resp.status}`);
         }
@@ -386,7 +386,7 @@ export function DashboardTab() {
         setLoadingUrgencias(true);
         setErrorUrgencias(null);
 
-        const resp = await fetch('/api/urgencias-triagem');
+        const resp = await fetch('https://ezhealthluixz.netlify.app/api/urgencias-triagem');
         if (!resp.ok) {
           throw new Error(`Erro HTTP: ${resp.status}`);
         }
@@ -407,7 +407,7 @@ export function DashboardTab() {
       try {
         setLoadingNotifications(true);
         setErrorNotifications(null);
-        const resp = await fetch('/api/notifications'); // Novo endpoint
+        const resp = await fetch('https://ezhealthluixz.netlify.app/api/notifications'); // Novo endpoint
         if (!resp.ok) {
           throw new Error(`Erro HTTP: ${resp.status}`);
         }

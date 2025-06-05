@@ -37,7 +37,7 @@ export function TriagensTab() {
   useEffect(() => {
     async function fetchTriagens() {
       try {
-        const response = await fetch('/api/triagem');
+        const response = await fetch('https://ezhealthluixz.netlify.app/api/triagem');
         if (!response.ok) {
           throw new Error(`Erro HTTP! status: ${response.status}`);
         }

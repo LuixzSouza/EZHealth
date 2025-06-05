@@ -11,35 +11,35 @@ import Link from 'next/link'; // Import Link for navigation
 const medicos = [
   {
     usuario: "joao",
-    senha: "1234",
+    senha: "4321",
     nome: "Dr. João Silva",
     foto: "/images/doctors/dr_joao_silva.png",
     especialidade: "Clínico Geral"
   },
   {
     usuario: "ana",
-    senha: "1234",
+    senha: "4321",
     nome: "Dra. Ana Paula",
     foto: "/images/doctors/dra_ana_paula.png",
     especialidade: "Pediatra"
   },
   {
     usuario: "marcos",
-    senha: "1234",
+    senha: "4321",
     nome: "Dr. Marcos Vinícius",
     foto: "/images/doctors/dr_marcos_vinicius.png",
     especialidade: "Clínico General"
   },
   {
     usuario: "camila",
-    senha: "1234",
+    senha: "4321",
     nome: "Dra. Camila Ribeiro",
     foto: "/images/doctors/dra_camila_ribeiro.png",
     especialidade: "Pediatra"
   },
   {
     usuario: "henrique",
-    senha: "1234",
+    senha: "4321",
     nome: "Dr. Henrique Souza",
     foto: "/images/doctors/dr_henrique_souza.png",
     especialidade: "Clínico Geral"
@@ -58,7 +58,7 @@ export default function LoginMedico() {
     setCarregando(true); // Start loading immediately
 
     // Special check for the administrator
-    if (username.toLowerCase() === 'admin' && password === '1234') {
+    if (username.toLowerCase() === 'admin' && password === '4321') {
       const admin = {
         nome: "Administrador",
         usuario: "admin",

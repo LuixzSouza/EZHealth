@@ -89,7 +89,7 @@ export function UsuariosAdminTab() {
       setLoading(true);
       setError(null);
       // Using relative path for API calls
-      const resp = await fetch("/api/triagem");
+      const resp = await fetch("https://ezhealthluixz.netlify.app/api/triagem");
       if (!resp.ok) {
         throw new Error(`HTTP Error! status: ${resp.status}`);
       }
@@ -136,7 +136,7 @@ export function UsuariosAdminTab() {
       let successMessage = "";
 
       if (pacienteToEdit) { // Editing an existing patient (triage record)
-        resp = await fetch(`/api/triagem`, {
+        resp = await fetch(`https://ezhealthluixz.netlify.app/api/triagem`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -155,7 +155,7 @@ export function UsuariosAdminTab() {
         });
         successMessage = "Paciente atualizado com sucesso!";
       } else { // Adding a new patient (creating a new triage record)
-        resp = await fetch("/api/triagem", {
+        resp = await fetch("https://ezhealthluixz.netlify.app/api/triagem", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -208,7 +208,7 @@ export function UsuariosAdminTab() {
     setConfirmMessage("Tem certeza que deseja remover este paciente? Esta ação é irreversível.");
     setConfirmAction(() => async () => {
       try {
-        const resp = await fetch(`/api/triagem?id=${id}`, {
+        const resp = await fetch(`https://ezhealthluixz.netlify.app/api/triagem?id=${id}`, {
           method: "DELETE"
         });
         if (!resp.ok) {

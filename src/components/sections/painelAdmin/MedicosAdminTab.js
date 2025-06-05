@@ -24,7 +24,7 @@ export function MedicosAdminTab() {
       try {
         setLoading(true);
         setError(null);
-        const resp = await fetch("/api/medicos");
+        const resp = await fetch("https://ezhealthluixz.netlify.app/api/medicos");
         if (!resp.ok) {
           throw new Error(`Erro HTTP! status: ${resp.status}`);
         }
@@ -54,7 +54,7 @@ export function MedicosAdminTab() {
     try {
       let resp;
       if (medicoToEdit) { // Editando um médico existente
-        resp = await fetch(`/api/medicos`, {
+        resp = await fetch(`https://ezhealthluixz.netlify.app/api/medicos`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -62,7 +62,7 @@ export function MedicosAdminTab() {
           body: JSON.stringify({ id: medicoToEdit.id, ...medicoData }),
         });
       } else { // Adicionando um novo médico
-        resp = await fetch("/api/medicos", {
+        resp = await fetch("https://ezhealthluixz.netlify.app/api/medicos", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export function MedicosAdminTab() {
       }
 
       // Re-busca a lista completa para garantir que a UI está atualizada
-      const updatedMedicosList = await fetch("/api/medicos").then(res => res.json());
+      const updatedMedicosList = await fetch("https://ezhealthluixz.netlify.app/api/medicos").then(res => res.json());
       setMedicos(updatedMedicosList);
       alert(medicoToEdit ? "Médico atualizado com sucesso!" : "Médico adicionado com sucesso!");
 
@@ -92,7 +92,7 @@ export function MedicosAdminTab() {
   const handleRemoveMedico = async (id) => {
     if (!confirm("Tem certeza que deseja remover este médico?")) return;
     try {
-      const resp = await fetch(`/api/medicos?id=${id}`, {
+      const resp = await fetch(`https://ezhealthluixz.netlify.app/api/medicos?id=${id}`, {
         method: "DELETE"
       });
       if (!resp.ok) {
