@@ -42,7 +42,7 @@ export function ConfiguracoesAdminTab() {
       <div className="space-y-6 sm:space-y-8">
         {/* Informações Gerais */}
         <section>
-          <h3 className="text-lg sm:text-xl font-semibold text-blue-900 dark:text-white mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Informações Gerais</h3>
+          <h3 className="text-lg sm:text-xl font-semibold text-blue-900 dark:text-white mb-4 border-b pb-2 border-zinc-200 dark:border-zinc-700">Informações Gerais</h3>
           <form className="space-y-4">
             <div>
               <label htmlFor="clinicName" className="block text-sm sm:text-base font-medium text-DarkBlue dark:text-white mb-1">Nome da Clínica/Plataforma</label>
@@ -51,7 +51,7 @@ export function ConfiguracoesAdminTab() {
                 id="clinicName"
                 value={clinicName}
                 onChange={(e) => setClinicName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 text-DarkBlue dark:text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm sm:text-base"
+                className="mt-1 block w-full px-3 py-2 border border-zinc-300 rounded-md dark:bg-zinc-700 dark:border-zinc-600 text-DarkBlue dark:text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm sm:text-base"
               />
             </div>
             <div>
@@ -61,7 +61,7 @@ export function ConfiguracoesAdminTab() {
                 id="supportEmail"
                 value={supportEmail}
                 onChange={(e) => setSupportEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 text-DarkBlue dark:text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm sm:text-base"
+                className="mt-1 block w-full px-3 py-2 border border-zinc-300 rounded-md dark:bg-zinc-700 dark:border-zinc-600 text-DarkBlue dark:text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm sm:text-base"
               />
             </div>
             <ButtonPrimary type="submit" onClick={handleSaveSystemSettings} className="w-full sm:w-auto">
@@ -72,12 +72,12 @@ export function ConfiguracoesAdminTab() {
 
         {/* Gerenciamento de Versão do Sistema */}
         <section>
-          <h3 className="text-lg sm:text-xl font-semibold text-blue-900 dark:text-white mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Gerenciamento de Versão</h3>
+          <h3 className="text-lg sm:text-xl font-semibold text-blue-900 dark:text-white mb-4 border-b pb-2 border-zinc-200 dark:border-zinc-700">Gerenciamento de Versão</h3>
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-md">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border border-zinc-200 dark:border-zinc-700 rounded-md">
               <div className="mb-2 sm:mb-0">
                 <p className="text-sm sm:text-base font-medium text-DarkBlue dark:text-white">Versão Atual do Sistema: <span className="font-bold">{systemVersion}</span></p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Verifique se há atualizações disponíveis.</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Verifique se há atualizações disponíveis.</p>
               </div>
               <ButtonPrimary onClick={handleUpdateSystemVersion} className="text-xs sm:text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                 Verificar e Atualizar
@@ -88,12 +88,12 @@ export function ConfiguracoesAdminTab() {
 
         {/* Configurações de API e Integrações */}
         <section>
-          <h3 className="text-lg sm:text-xl font-semibold text-blue-900 dark:text-white mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">APIs e Integrações</h3>
+          <h3 className="text-lg sm:text-xl font-semibold text-blue-900 dark:text-white mb-4 border-b pb-2 border-zinc-200 dark:border-zinc-700">APIs e Integrações</h3>
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-md">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border border-zinc-200 dark:border-zinc-700 rounded-md">
               <div className="mb-2 sm:mb-0">
                 <p className="text-sm sm:text-base font-medium text-DarkBlue dark:text-white">Status das Chaves de API: <span className={`font-bold ${apiKeysStatus === 'Ativas' ? 'text-green-600' : 'text-red-600'}`}>{apiKeysStatus}</span></p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Gerencie chaves para serviços como Dialogflow, SMS, etc.</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Gerencie chaves para serviços como Dialogflow, SMS, etc.</p>
               </div>
               <ButtonPrimary onClick={handleManageApiKeys} className="text-xs sm:text-sm px-3 py-1 w-full sm:w-auto">
                 Gerenciar Chaves

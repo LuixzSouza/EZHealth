@@ -7,13 +7,14 @@ import Image from "next/image";
 
 import { Header } from "@/components/layout/Header";
 import { Heading } from "@/components/typography/Heading";
-import { ParagraphBlue } from "@/components/theme/ParagraphBlue"; // Assumindo que você tem este componente
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"; // Ícones do Heroicons
+import { ParagraphBlue } from "@/components/theme/ParagraphBlue";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 // Importar os componentes das abas administrativas
 import { DashboardAdminTab } from "@/components/sections/painelAdmin/DashboardAdminTab";
 import { MedicosAdminTab } from "@/components/sections/painelAdmin/MedicosAdminTab";
 import { UsuariosAdminTab } from "@/components/sections/painelAdmin/UsuariosAdminTab";
+import { SalasAdminTab } from "@/components/sections/painelAdmin/SalasAdminTab"; // Importar a nova aba
 import { ConfiguracoesAdminTab } from "@/components/sections/painelAdmin/ConfiguracoesAdminTab";
 import { SidebarLink } from "@/components/sections/painelAdmin/SidebarLink";
 
@@ -22,14 +23,13 @@ export default function PainelAdmin() {
   const [admin, setAdmin] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isLoggingOut, setIsLoggingOut] = useState(false); // Estado para controlar a tela de saída
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     document.title = "Painel Admin - EZHealth";
     const adminLogado = localStorage.getItem("adminLogado");
     if (!adminLogado) {
-      // Se não há admin logado e não estamos no processo de saída, redireciona
       if (!isLoggingOut) {
         router.push("/login-medico");
       }
@@ -49,17 +49,15 @@ export default function PainelAdmin() {
     handleResize(); // Define o estado inicial
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [isLoggingOut, router]); // 'isLoggingOut' adicionado às dependências
+  }, [isLoggingOut, router]);
 
-  // Função para lidar com o logout, mostrando a tela de carregamento
   const handleLogout = () => {
-    setIsLoggingOut(true); // Ativa o estado para mostrar a tela de saída
-    localStorage.removeItem("adminLogado"); // Remove o item do localStorage imediatamente
+    setIsLoggingOut(true);
+    localStorage.removeItem("adminLogado");
 
-    // Espera um tempo para a tela de carregamento ser visível antes de redirecionar
     setTimeout(() => {
       router.push("/login-medico");
-    }, 1500); // Ajuste este tempo (em ms) conforme a duração desejada para a tela de saída
+    }, 1500);
   };
 
   if (!admin) {
@@ -79,6 +77,8 @@ export default function PainelAdmin() {
         return <MedicosAdminTab />;
       case 'usuarios':
         return <UsuariosAdminTab />;
+      case 'salas': // Novo case para a aba de salas
+        return <SalasAdminTab />;
       case 'configuracoes':
         return <ConfiguracoesAdminTab />;
       default:
@@ -90,16 +90,14 @@ export default function PainelAdmin() {
     <>
       <Header />
 
-      {/* Condição para mostrar a tela de carregamento de logout OU o painel admin */}
       {isLoggingOut ? (
-        // Componente da tela de carregamento de logout (agora embutido)
         <div className="fixed inset-0 flex flex-col items-center justify-center bg-white dark:bg-themeDark z-[60] transition-opacity duration-500 opacity-100">
           <Image
-            src="/icons/admin-avatar.png" // Foto do admin
+            src="/icons/admin-avatar.png"
             width={100}
             height={100}
             alt="Admin"
-            className="rounded-full animate-pulse" // Animação simples na foto
+            className="rounded-full animate-pulse"
           />
           <Heading
             as="h2"
@@ -110,16 +108,13 @@ export default function PainelAdmin() {
           <ParagraphBlue className="mt-2 text-sm sm:text-base text-center">
             Saindo do painel de controle...
           </ParagraphBlue>
-          {/* Ícone de Loading SVG */}
           <svg className="animate-spin h-8 w-8 text-orange-500 mt-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
         </div>
       ) : (
-        // Conteúdo normal do Painel Admin (visível quando NÃO está fazendo logout)
         <div className="flex min-h-screen">
-          {/* Sidebar */}
           <aside className={`
             bg-white dark:bg-themeDark p-6 space-y-6 shadow-md
             fixed inset-y-0 left-0 z-[51]
@@ -133,7 +128,7 @@ export default function PainelAdmin() {
           `}>
             <div className="flex flex-col items-center">
               <Image
-                src="/icons/admin-avatar.png" // Verifique se este ícone existe
+                src="/icons/admin-avatar.png"
                 width={80}
                 height={80}
                 alt="Admin"
@@ -144,13 +139,15 @@ export default function PainelAdmin() {
             </div>
 
             <nav className="flex flex-col gap-2 mt-6">
-              {['dashboard','medicos','usuarios','configuracoes'].map(tab => (
+              {['dashboard', 'medicos', 'usuarios', 'salas', 'configuracoes'].map(tab => ( // Adicione 'salas' aqui
                 <SidebarLink
                   key={tab}
                   icon={`/icons/${tab}.svg`}
                   title={tab === 'dashboard' ? 'Dashboard' :
-                                 tab === 'medicos' ? 'Médicos' :
-                                 tab === 'usuarios' ? 'Usuários' : 'Configurações'}
+                         tab === 'medicos' ? 'Médicos' :
+                         tab === 'usuarios' ? 'Usuários' :
+                         tab === 'salas' ? 'Salas' : // Novo título para 'salas'
+                         'Configurações'}
                   tab={tab}
                   activeTab={activeTab}
                   onClick={() => {
@@ -172,7 +169,6 @@ export default function PainelAdmin() {
             </button>
           </aside>
 
-          {/* Overlay para fechar sidebar em mobile */}
           {sidebarOpen && window.innerWidth < 768 && (
             <div
               className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
@@ -180,9 +176,7 @@ export default function PainelAdmin() {
             ></div>
           )}
 
-          {/* Conteúdo Principal */}
           <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-themeDark">
-            {/* Botão de abrir/fechar menu para mobile */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="mb-4 md:hidden bg-blue-100 dark:bg-gray-700 text-blue-900 dark:text-white px-3 py-2 rounded-lg flex items-center gap-2"

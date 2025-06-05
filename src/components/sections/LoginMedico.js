@@ -88,7 +88,7 @@ export default function LoginMedico() {
   // Check if a user (doctor or admin) is being loaded
   if (carregando && userLoggedIn) {
     return (
-      <section className="py-14 flex items-center justify-center px-4 h-screen bg-gray-100 dark:bg-themeDark">
+      <section className="py-14 flex items-center justify-center px-4 h-screen bg-zinc-100 dark:bg-themeDark">
         <ContainerGrid className="max-w-lg text-center flex flex-col items-center gap-6 animate-fade-in bg-white dark:bg-themeDark p-8 rounded-2xl shadow-xl">
           <HeadingOrange text={`Bem-vindo, ${userLoggedIn.nome}!`} />
           <Image
@@ -98,7 +98,7 @@ export default function LoginMedico() {
             height={150}
             className="rounded-full shadow-lg border-4 border-orange animate-pulse"
           />
-          <p className="text-blue-900 dark:text-gray-200 text-lg font-medium animate-fade-in">
+          <p className="text-blue-900 dark:text-zinc-200 text-lg font-medium animate-fade-in">
             Redirecionando você para o painel {userLoggedIn.role === 'admin' ? 'administrativo' : 'médico'}. Por favor, aguarde...
           </p>
 
@@ -110,10 +110,10 @@ export default function LoginMedico() {
   }
 
   return (
-    <section className="dark:bg-themeDark flex items-center justify-center bg-gray-100 px-4 min-h-screen">
+    <section className="dark:bg-themeDark flex items-center justify-center bg-zinc-100 px-4 min-h-screen">
       <ContainerGrid className="max-w-md bg-white dark:bg-white/10 shadow-xl rounded-2xl p-10 text-center shadow-black/10 dark:shadow-white/10">
         <HeadingOrange text="Acesso Exclusivo para Médicos" />
-        <p className="text-gray-600 dark:text-gray-400 mt-2 mb-6">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-2 mb-6">
           Por favor, insira suas credenciais para acessar o painel.
         </p>
         <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-4 text-black text-lg">
@@ -122,7 +122,7 @@ export default function LoginMedico() {
             placeholder="Usuário"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="border-2 border-orange rounded-md p-3 w-full bg-transparent dark:bg-white focus:outline-none focus:ring-2 focus:ring-orange placeholder-gray-500"
+            className="border-2 border-orange rounded-md p-3 w-full bg-transparent dark:bg-white focus:outline-none focus:ring-2 focus:ring-orange placeholder-zinc-500"
             required
             aria-label="Usuário"
           />
@@ -131,7 +131,7 @@ export default function LoginMedico() {
             placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border-2 border-orange rounded-md p-3 w-full bg-transparent dark:bg-white focus:outline-none focus:ring-2 focus:ring-orange placeholder-gray-500"
+            className="border-2 border-orange rounded-md p-3 w-full bg-transparent dark:bg-white focus:outline-none focus:ring-2 focus:ring-orange placeholder-zinc-500"
             required
             aria-label="Senha"
           />
@@ -165,7 +165,7 @@ export default function LoginMedico() {
                 <span className="font-medium">Senha para todos:</span> 1234
               </li>
             </ul>
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 italic">
               * O acesso de teste não inclui todas as funcionalidades da versão completa.
             </p>
           </div>

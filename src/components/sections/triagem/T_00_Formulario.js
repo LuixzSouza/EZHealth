@@ -123,20 +123,20 @@ function StepNavigator({ currentStep, totalSteps, onNext, onBack, title }) {
             <button
                 onClick={onBack}
                 disabled={currentStep === 0}
-                className={`px-4 py-2 rounded-md border ${currentStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+                className={`px-4 py-2 rounded-md border ${currentStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-100'}`}
                 aria-label="Voltar etapa"
             >
                 Voltar
             </button>
 
-            <span className="text-gray-700 font-bold text-sm sm:text-base">
+            <span className="text-zinc-700 font-bold text-sm sm:text-base">
                 Etapa {currentStep + 1} de {totalSteps}: {title}
             </span>
 
             <button
                 onClick={onNext}
                 disabled={currentStep === totalSteps - 1}
-                className={`px-4 py-2 rounded-md text-white ${currentStep === totalSteps - 1 ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange hover:bg-orange-dark'}`}
+                className={`px-4 py-2 rounded-md text-white ${currentStep === totalSteps - 1 ? 'bg-zinc-400 cursor-not-allowed' : 'bg-orange hover:bg-orange-dark'}`}
                 aria-label="Avançar etapa"
             >
                 {currentStep === totalSteps - 1 ? 'Aguarde...' : 'Próximo'}

@@ -141,21 +141,21 @@ export function AgendaTab() {
             <ParagraphBlue className="mb-4 sm:mb-6 text-sm sm:text-base">Seus próximos compromissos.</ParagraphBlue>
 
             {loading ? (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">Carregando agenda...</p>
+                <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base">Carregando agenda...</p>
             ) : error ? (
                 <p className="text-red-500 dark:text-red-400 text-center py-6 sm:py-8 text-sm sm:text-base">{error}</p>
             ) : appointments.length > 0 ? (
                 <ul className="space-y-3 sm:space-y-4">
                     {appointments.map((appointment) => (
-                        <li key={appointment._id} className="p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-md flex flex-col sm:flex-row justify-between sm:items-center">
+                        <li key={appointment._id} className="p-3 sm:p-4 border border-zinc-200 dark:border-zinc-700 rounded-md flex flex-col sm:flex-row justify-between sm:items-center">
                             <div className="mb-2 sm:mb-0">
                                 <p className="text-base sm:text-lg font-semibold text-DarkBlue dark:text-white leading-tight">
                                     {new Date(appointment.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })} - {appointment.time}
                                 </p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.description}</p>
+                                <p className="text-sm text-zinc-600 dark:text-zinc-400">{appointment.description}</p>
                                 {/* Opcional: exibir o nome do paciente aqui, se o documento tiver */}
                                 {appointment.patientName && (
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">Paciente: {appointment.patientName}</p>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Paciente: {appointment.patientName}</p>
                                 )}
                             </div>
                             {/* Você pode adicionar botões de Ações aqui */}
@@ -163,7 +163,7 @@ export function AgendaTab() {
                     ))}
                 </ul>
             ) : (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">Nenhum compromisso agendado para {medicoLogadoNome || 'este médico'}.</p>
+                <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base">Nenhum compromisso agendado para {medicoLogadoNome || 'este médico'}.</p>
             )}
 
             <div className="mt-6 sm:mt-8 text-center">

@@ -1,248 +1,269 @@
-// pages/api/triagem.js
-import { MongoClient, ObjectId } from 'mongodb'; // Import ObjectId
+import { MongoClient, ObjectId } from 'mongodb';
 
-// Configurações da conexão com o MongoDB
+// Configurações da conexão (sem alterações)
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_DB_NAME || 'ezhealth_db';
-
 let client;
 let clientPromise;
-
-if (!uri) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
-
+if (!uri) { throw new Error('Please define the MONGODB_URI environment variable inside .env.local'); }
 if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromise) {
+  if (!global._mongoClientPromiseTriagens) {
     client = new MongoClient(uri);
-    global._mongoClientPromise = client.connect();
+    global._mongoClientPromiseTriagens = client.connect();
   }
-  clientPromise = global._mongoClientPromise;
+  clientPromise = global._mongoClientPromiseTriagens;
 } else {
   client = new MongoClient(uri);
   clientPromise = client.connect();
 }
 
-// --- Funções Auxiliares de Backend (Lógica de Negócio Exclusiva do Backend) ---
-// Estas funções serão chamadas DENTRO do método POST
-
-// Dados para geração aleatória (APENAS NO BACKEND)
-const medicos = [
-    { nome: "Dr. João Silva", foto: "/images/doctors/dr_joao_silva.png" },
-    { nome: "Dra. Ana Paula", foto: "/images/doctors/dra_ana_paula.png" },
-    { nome: "Dr. Marcos Vinícius", foto: "/images/doctors/dr_marcos_vinicius.png" },
-    { nome: "Dra. Camila Ribeiro", foto: "/images/doctors/dra_camila_ribeiro.png" },
-    { nome: "Dra. Larissa Mendes", foto: "/images/doctors/dra_larissa_mendes.png" },
-    { nome: "Dr. Rafael Albuquerque", foto: "/images/doctors/dr_rafael_albuquerque.png" },
-    { nome: "Dra. Beatriz Costa", foto: "/images/doctors/dra_beatriz_cota.png" },
-    { nome: "Dr. Henrique Souza", foto: "/images/doctors/dr_henrique_souza.png" },
-];
-
-const senhas = ["A123", "B456", "C789", "D321", "E654"];
-const salas = ["01", "02", "03", "04", "05"];
-
-function gerarDadosAleatoriosAtendimento() {
-    return {
-        senha: senhas[Math.floor(Math.random() * senhas.length)],
-        sala: salas[Math.floor(Math.random() * salas.length)],
-        medico: medicos[Math.floor(Math.random() * medicos.length)],
-    };
-}
-
-// Função para classificar o risco (APENAS NO BACKEND)
-function classifyRiskBackend(triagemData) {
+function classifyRiskBackend(triagemData) { // Sem alterações
   const { sinaisVitais = {}, sintomas = {}, sintomasDetalhes = {}, historico = {} } = triagemData;
-
-  // Função auxiliar para validar e converter número (ou retornar undefined)
-  function toNumber(value) {
-    const num = parseFloat(value);
-    return isNaN(num) ? undefined : num;
-  }
-
-  // 1. Extrair e validar sinais vitais
+  function toNumber(value) { const num = parseFloat(value); return isNaN(num) ? undefined : num; }
   const temperatura = toNumber(sinaisVitais.temperatura);
-  // Para pressão, só converte se tiver exatamente "X/Y" e ambos forem numéricos
   let pressaoSistolica, pressaoDiastolica;
   if (typeof sinaisVitais.pressao === "string" && sinaisVitais.pressao.includes("/")) {
     const [sist, diast] = sinaisVitais.pressao.split("/");
-    const ps = toNumber(sist);
-    const pd = toNumber(diast);
-    if (ps !== undefined && pd !== undefined) {
-      pressaoSistolica = ps;
-      pressaoDiastolica = pd;
-    }
+    const ps = toNumber(sist); const pd = toNumber(diast);
+    if (ps !== undefined && pd !== undefined) { pressaoSistolica = ps; pressaoDiastolica = pd; }
   }
-  // Caso não tenha formato válido, ficam undefined e não entram nas comparações
   const frequencia = toNumber(sinaisVitais.frequencia);
   const saturacao = toNumber(sinaisVitais.saturacao);
-
-  // 2. Inicializa nível padrão (Azul: não urgente)
-  let riskLevel = {
-    color: "Azul",
-    label: "Não Urgente",
-    time: "até 4 horas",
-    priority: 5
-  };
-
-  // 3. VERIFICAÇÕES DE “VERMELHO” (Emergência, prioridade 1)
-  //  - saturação < 90%
-  //  - frequência cardíaca > 130 bpm
-  //  - pressão arterial sistólica ≥ 180 ou diastólica ≥ 110
-  //  - dor no peito ou falta de ar
-  if (
-    (saturacao !== undefined && saturacao < 90) ||
-    (frequencia  !== undefined && frequencia  > 130) ||
-    (pressaoSistolica !== undefined && pressaoSistolica >= 180) ||
-    (pressaoDiastolica !== undefined && pressaoDiastolica >= 110) ||
-    (sintomas.dorPeito === true) ||
-    (sintomas.faltaAr === true)
-  ) {
-    return { color: "Vermelho", label: "Emergência", time: "imediato", priority: 1 };
-  }
-
-  // 4. VERIFICAÇÕES DE “LARANJA” (Muito urgente, prioridade 2)
-  //  - temperatura ≥ 39 °C (sinal de febre alta)
-  //  - frequência entre 100 e 130 bpm (se maior que 100 mas ≤ 130)
-  //  - tontura com menos de 24h (sintomasDetalhes.tempoSintomas === "menos24h")
-  //  - náusea/vômito nas últimas 24h (sintomas.nauseaVomito === true && tempoSintomas === "menos24h")
-  if (
-    (temperatura !== undefined && temperatura >= 39) ||
-    (frequencia  !== undefined && frequencia  > 100 && frequencia <= 130) ||
-    (sintomas.tontura === true && sintomasDetalhes.tempoSintomas === "menos24h") ||
-    (sintomas.nauseaVomito === true && sintomasDetalhes.tempoSintomas === "menos24h")
-  ) {
-    return { color: "Laranja", label: "Muito Urgente", time: "até 10 minutos", priority: 2 };
-  }
-
-  // 5. VERIFICAÇÕES DE “AMARELO” (Urgente, prioridade 3)
-  //  - febre moderada (≥ 38,5 °C e < 39 °C)
-  //  - dor de cabeça intensa (sintomas.dorCabeca === true)
-  //  - histórico de comorbidades relevantes (hipertensão, diabetes, cardiaco, respiratorio)
-  if (
-    (temperatura !== undefined && temperatura >= 38.5 && temperatura < 39) ||
-    (sintomas.febre === true) ||
-    (sintomas.dorCabeca === true) ||
-    (historico.hipertensao === true) ||
-    (historico.diabetes === true) ||
-    (historico.cardiaco === true) ||
-    (historico.respiratorio === true)
-  ) {
-    return { color: "Amarelo", label: "Urgente", time: "até 60 minutos", priority: 3 };
-  }
-
-  // 6. VERIFICAÇÕES DE “VERDE” (Pouco urgente, prioridade 4)
-  //  - tosse leve sem comorbidades ou dor leve, com tempo de sintomas entre 1 e 3 dias
-  if (
-    (sintomas.tosse === true && sintomasDetalhes.tempoSintomas === "1a3dias") ||
-    // Exemplo adicional: dor de garganta ou mal-estar leve pode entrar aqui
-    (sintomas.outros && sintomas.outros.trim() !== "")
-  ) {
-    return { color: "Verde", label: "Pouco Urgente", time: "até 2 horas", priority: 4 };
-  }
-
-  // 7. SE NENHUMA DAS CONDIÇÕES ASIMA FOI ATENDIDA → “AZUL” (Não urgente, prioridade 5)
+  const opacity = 0.5;
+  let riskLevel = { color: `rgba(0, 0, 255, ${opacity})`, label: "Não Urgente", time: "até 4 horas", priority: 5 };
+  if ((saturacao !== undefined && saturacao < 90) || (frequencia !== undefined && frequencia > 130) || (pressaoSistolica !== undefined && pressaoSistolica >= 180) || (pressaoDiastolica !== undefined && pressaoDiastolica >= 110) || (sintomas.dorPeito === true) || (sintomas.faltaAr === true)) { return { color: `rgba(255, 0, 0, ${opacity})`, label: "Emergência", time: "imediato", priority: 1 }; }
+  if ((temperatura !== undefined && temperatura >= 39) || (frequencia !== undefined && frequencia > 100 && frequencia <= 130) || (sintomas.tontura === true && sintomasDetalhes.tempoSintomas === "menos24h") || (sintomas.nauseaVomito === true && sintomasDetalhes.tempoSintomas === "menos24h")) { return { color: `rgba(255, 140, 0, ${opacity})`, label: "Muito Urgente", time: "até 10 minutos", priority: 2 }; }
+  if ((temperatura !== undefined && temperatura >= 38.5 && temperatura < 39) || (sintomas.febre === true) || (sintomas.dorCabeca === true) || (historico.hipertensao === true) || (historico.diabetes === true) || (historico.cardiaco === true) || (historico.respiratorio === true)) { return { color: `rgba(255, 215, 0, ${opacity})`, label: "Urgente", time: "até 60 minutos", priority: 3 }; }
+  if ((sintomas.tosse === true && sintomasDetalhes.tempoSintomas === "1a3dias") || (sintomas.outros && sintomas.outros.trim() !== "")) { return { color: `rgba(0, 128, 0, ${opacity})`, label: "Pouco Urgente", time: "até 2 horas", priority: 4 }; }
   return riskLevel;
 }
 
-// --- Manipulador da API ---
-
 export default async function handler(req, res) {
+  console.log(`[API /api/triagem] Requisição recebida: ${req.method}`);
   try {
     const client = await clientPromise;
     const db = client.db(dbName);
-    const collection = db.collection('triagens'); // Nome da sua coleção
+    const triagensCollection = db.collection('triagens');
+    const salasCollection = db.collection('salas');
+    const medicosCollection = db.collection('medicos');
 
     if (req.method === 'POST') {
       const dataBrutaDoFrontend = req.body;
-
-      // 1. Executa a lógica de classificação de risco (APENAS NO BACKEND)
       const classificacao = classifyRiskBackend(dataBrutaDoFrontend);
 
-      // 2. Executa a lógica de geração de dados de atendimento (APENAS NO BACKEND)
-      const infoAtendimento = gerarDadosAleatoriosAtendimento();
+      let assignedSala = null;
+      let assignedMedico = null;
+      let generatedSenha = "Aguardando";
+      let roomDocument = null; // Para armazenar o documento da sala encontrada
 
-      // 3. Combina todos os dados antes de salvar no MongoDB
+      console.log('[API /api/triagem] Método POST. Tentando encontrar uma sala disponível...');
+      const querySalaDisponivel = { patientId: null }; // Condição para sala disponível
+      
+      // Tenta encontrar e "reservar" uma sala atomicamente (ou apenas encontrar, se preferir não reservar aqui)
+      // Usar findOneAndUpdate pode "reservar" a sala se você mudar um campo nela.
+      // Se for apenas para checar disponibilidade sem alterar, um findOne simples seria suficiente.
+      // A lógica atual com findOneAndUpdate e $set: {updatedAt} não "reserva" a sala para o patientId ainda.
+      roomDocument = await salasCollection.findOneAndUpdate(
+        querySalaDisponivel,
+        { $set: { updatedAt: new Date() } }, // Apenas atualiza o timestamp da sala encontrada
+        { returnDocument: 'after' }
+      );
+      console.log('[API /api/triagem] Documento da sala retornado por findOneAndUpdate:', roomDocument);
+
+
+      if (roomDocument) {
+        assignedSala = {
+          id: roomDocument._id.toString(),
+          name: roomDocument.name,
+          type: roomDocument.type || 'Geral'
+        };
+        generatedSenha = `SALA-${assignedSala.name.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()}`;
+        console.log('[API /api/triagem] Sala encontrada para atribuição:', assignedSala.name);
+
+        let doctorToAssign = null;
+        if (roomDocument.doctorId) {
+          try {
+            doctorToAssign = await medicosCollection.findOne({ _id: new ObjectId(roomDocument.doctorId) });
+            if (doctorToAssign) console.log('[API /api/triagem] Médico fixo da sala encontrado:', doctorToAssign.nome);
+            else console.log(`[API /api/triagem] Médico fixo da sala (ID: ${roomDocument.doctorId}) não encontrado.`);
+          } catch (e) { console.error(`Erro ao buscar médico fixo ${roomDocument.doctorId}: ${e.message}`);}
+        }
+
+        if (!doctorToAssign) {
+          const activeDoctors = await medicosCollection.find({ status: "Ativo" }).toArray();
+          if (activeDoctors.length > 0) {
+            doctorToAssign = activeDoctors[Math.floor(Math.random() * activeDoctors.length)];
+            console.log('[API /api/triagem] Médico aleatório ativo atribuído:', doctorToAssign.nome);
+            // Atualiza a sala com o doctorId do médico aleatório atribuído
+            // Esta atualização é importante para refletir o médico na sala.
+             await salasCollection.updateOne(
+               { _id: roomDocument._id },
+               { $set: { doctorId: new ObjectId(doctorToAssign._id), updatedAt: new Date() } }
+             );
+          } else {
+            console.log('[API /api/triagem] Nenhum médico ativo disponível.');
+          }
+        }
+        if (doctorToAssign) {
+          assignedMedico = {
+            id: doctorToAssign._id.toString(),
+            nome: doctorToAssign.nome,
+            foto: doctorToAssign.foto || "/icons/medico-avatar.svg",
+            statusDoMedicoNoMomentoDaTriagem: doctorToAssign.status
+          };
+        }
+      } else {
+        console.log('[API /api/triagem] Nenhuma sala disponível encontrada.');
+      }
+
+      // Define o status da triagem inteligentemente
+      let statusParaTriagem = "Pendente"; // Default
+      if (dataBrutaDoFrontend.atendimentoInfo && dataBrutaDoFrontend.atendimentoInfo.status) {
+          statusParaTriagem = dataBrutaDoFrontend.atendimentoInfo.status; // Usa status do frontend se fornecido (ex: admin adicionando)
+      } else if (assignedSala) { // Se não veio do frontend, mas uma sala foi designada
+          statusParaTriagem = assignedMedico ? "Em Atendimento" : "Aguardando Sala";
+      }
+
       const triagemFinalParaSalvar = {
-        ...dataBrutaDoFrontend, // Dados brutos do frontend
-        classificacaoRisco: classificacao, // Classificação gerada no backend
-        atendimentoInfo: { // Informações de atendimento geradas no backend
-            // Preserve existing atendimentoInfo if present, then add/overwrite generated ones
-            ...dataBrutaDoFrontend.atendimentoInfo,
-            senha: infoAtendimento.senha,
-            sala: infoAtendimento.sala,
-            medico: infoAtendimento.medico,
-            status: dataBrutaDoFrontend.atendimentoInfo?.status || "Pendente" // Ensure status is set
+        ...dataBrutaDoFrontend,
+        classificacaoRisco: classificacao,
+        atendimentoInfo: {
+          ...(dataBrutaDoFrontend.atendimentoInfo || {}),
+          senha: generatedSenha,
+          sala: assignedSala ? assignedSala.name : "Não Atribuída",
+          roomId: assignedSala ? new ObjectId(assignedSala.id) : null,
+          medico: assignedMedico || null,
+          status: statusParaTriagem // Status definido inteligentemente
         },
-        createdAt: new Date(), // Timestamp de criação
+        createdAt: new Date(),
+        updatedAt: new Date() // Adiciona updatedAt na criação
       };
 
-      const result = await collection.insertOne(triagemFinalParaSalvar);
+      const resultInsertTriage = await triagensCollection.insertOne(triagemFinalParaSalvar);
+      const newTriageId = resultInsertTriage.insertedId;
+
+      if (assignedSala && roomDocument) { // Se uma sala foi efetivamente designada
+       await salasCollection.updateOne(
+          { _id: roomDocument._id },
+          { $set: { patientId: newTriageId, updatedAt: new Date() } } // Agora atribui o patientId à sala
+        );
+      }
+
+      // Retorna a triagem completa, incluindo o status potencialmente ajustado
+      const triagemCompletaRetorno = await triagensCollection.findOne({_id: newTriageId});
 
       res.status(201).json({
         message: 'Triagem salva e processada com sucesso!',
-        id: result.insertedId,
-        triagemCompleta: triagemFinalParaSalvar
+        id: newTriageId.toString(),
+        triagemCompleta: triagemCompletaRetorno 
       });
 
     } else if (req.method === 'GET') {
-      const triagens = await collection.find({}).toArray();
-      res.status(200).json(triagens);
+      // Lógica do GET (sem alterações diretas de status aqui, mas pode precisar de uma rota específica para /api/triagem?id=...)
+      const { id } = req.query;
+      if (id) { // Se um ID específico é solicitado
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).json({ message: 'ID da triagem inválido.' });
+        }
+        const triagem = await triagensCollection.findOne({ _id: new ObjectId(id) });
+        if (!triagem) {
+          return res.status(404).json({ message: 'Triagem não encontrada.' });
+        }
+        // Calcular posição na fila para esta triagem específica
+        let positionInQueue = null;
+        const statusAguardando = ["Pendente", "Aguardando Sala"];
+        if (triagem.atendimentoInfo && statusAguardando.includes(triagem.atendimentoInfo.status)) {
+          const prioridadeAtual = triagem.classificacaoRisco?.priority;
+          const createdAtAtual = new Date(triagem.createdAt);
+          if (prioridadeAtual !== undefined && !isNaN(createdAtAtual.getTime())) {
+            const higherPriorityCount = await triagensCollection.countDocuments({
+              "atendimentoInfo.status": { $in: statusAguardando },
+              "classificacaoRisco.priority": { $lt: prioridadeAtual },
+              "_id": { $ne: new ObjectId(id) }
+            });
+            const samePriorityOlderCount = await triagensCollection.countDocuments({
+              "atendimentoInfo.status": { $in: statusAguardando },
+              "classificacaoRisco.priority": prioridadeAtual,
+              "createdAt": { $lt: createdAtAtual },
+              "_id": { $ne: new ObjectId(id) }
+            });
+            positionInQueue = higherPriorityCount + samePriorityOlderCount + 1;
+          }
+        }
+        return res.status(200).json({ ...triagem, posicaoFila: positionInQueue });
+      } else { // Se nenhum ID é solicitado, retorna todas as triagens
+        const triagens = await triagensCollection.find({}).sort({ createdAt: -1 }).toArray();
+        return res.status(200).json(triagens);
+      }
 
     } else if (req.method === 'PUT') {
-      // Logic for updating an existing triage record
-      const { id, dadosPessoalPaciente, atendimentoInfo } = req.body;
+      const triageIdFromQuery = req.query.id; // ID vem da query string
+      const updatePayload = req.body;       // Dados para atualização vêm do corpo
 
-      if (!id || !ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'Invalid or missing triage ID for update.' });
+      if (!triageIdFromQuery || !ObjectId.isValid(triageIdFromQuery)) {
+        return res.status(400).json({ message: 'ID da triagem inválido ou ausente na query string.' });
       }
 
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          "dadosPessoalPaciente.nome": dadosPessoalPaciente?.nome,
-          "dadosPessoalPaciente.dataNascimento": dadosPessoalPaciente?.dataNascimento,
-          "dadosPessoalPaciente.idade": dadosPessoalPaciente?.idade,
-          "dadosPessoalPaciente.cpf": dadosPessoalPaciente?.cpf,
-          "dadosPessoalPaciente.telefone": dadosPessoalPaciente?.telefone,
-          "dadosPessoalPaciente.sexo": dadosPessoalPaciente?.sexo,
-          "dadosPessoalPaciente.temConvenio": dadosPessoalPaciente?.temConvenio,
-          "atendimentoInfo.status": atendimentoInfo?.status,
-          // Add other specific fields from triage you want to allow updating here
-        },
-      };
+      const filter = { _id: new ObjectId(triageIdFromQuery) };
+      const updateDoc = { $set: {} };
+      let fieldsToUpdateCount = 0;
 
-      const result = await collection.updateOne(filter, updateDoc);
+      // Atualiza campos em dadosPessoalPaciente, se fornecido
+      if (updatePayload.dadosPessoalPaciente) {
+        for (const key in updatePayload.dadosPessoalPaciente) {
+          if (updatePayload.dadosPessoalPaciente[key] !== undefined) {
+            updateDoc.$set[`dadosPessoalPaciente.${key}`] = updatePayload.dadosPessoalPaciente[key];
+            fieldsToUpdateCount++;
+          }
+        }
+      }
+      // Atualiza status em atendimentoInfo, se fornecido
+      if (updatePayload.atendimentoInfo && updatePayload.atendimentoInfo.status !== undefined) {
+        updateDoc.$set["atendimentoInfo.status"] = updatePayload.atendimentoInfo.status;
+        fieldsToUpdateCount++;
+      }
+      // Você pode adicionar outras lógicas para atualizar mais campos de atendimentoInfo aqui se necessário
+
+      if (fieldsToUpdateCount === 0) {
+        return res.status(400).json({ message: 'Nenhum campo válido para atualização foi fornecido.' });
+      }
+      updateDoc.$set["updatedAt"] = new Date();
+
+      const result = await triagensCollection.updateOne(filter, updateDoc);
 
       if (result.matchedCount === 0) {
-        return res.status(404).json({ message: 'Triage not found.' });
+        return res.status(404).json({ message: 'Triagem não encontrada para atualização.' });
       }
-      res.status(200).json({ message: 'Triage updated successfully.' });
-
-    } else if (req.method === 'DELETE') {
-      // Logic for deleting a triage record
-      const { id } = req.query; // ID comes from query parameter for DELETE
-
-      if (!id || !ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'Invalid or missing triage ID for deletion.' });
+      if (result.modifiedCount === 0 && result.matchedCount === 1) {
+        // Encontrou mas nada mudou (talvez os dados enviados eram os mesmos já existentes)
+        return res.status(200).json({ message: 'Nenhuma alteração aplicada, os dados podem já estar atualizados.' });
       }
+      res.status(200).json({ message: 'Triagem atualizada com sucesso.' });
 
-      const result = await collection.deleteOne({ _id: new ObjectId(id) });
-
-      if (result.deletedCount === 0) {
-        return res.status(404).json({ message: 'Triage not found.' });
+    } else if (req.method === 'DELETE') { // Sem alterações na lógica DELETE, mas confirmando que usa req.query.id
+      const { id } = req.query;
+      if (!id || !ObjectId.isValid(id)) { return res.status(400).json({ message: 'Invalid or missing triage ID for deletion.' }); }
+      const triageToDelete = await triagensCollection.findOne({ _id: new ObjectId(id) });
+      if (!triageToDelete) { return res.status(404).json({ message: 'Triage not found for deletion.' }); }
+      if (triageToDelete.atendimentoInfo && triageToDelete.atendimentoInfo.roomId) {
+        try {
+            await salasCollection.updateOne(
+              { _id: new ObjectId(triageToDelete.atendimentoInfo.roomId) },
+              { $set: { patientId: null, doctorId: null, updatedAt: new Date() } }
+            );
+        } catch (e) {
+            console.error(`Erro ao tentar liberar sala ${triageToDelete.atendimentoInfo.roomId}: ${e.message}`);
+        }
       }
+      const result = await triagensCollection.deleteOne({ _id: new ObjectId(id) });
+      if (result.deletedCount === 0) { return res.status(404).json({ message: 'Triage not found during deletion attempt.' }); }
       res.status(200).json({ message: 'Triage deleted successfully.' });
-
     } else {
       res.setHeader('Allow', ['POST', 'GET', 'PUT', 'DELETE']);
       res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
-    console.error('Erro ao processar a requisição:', error);
-    res.status(500).json({ message: 'Erro interno do servidor.', error: error.message });
+    console.error('[API /api/triagem] Erro crítico ao processar a requisição:', error);
+    res.status(500).json({ message: 'Erro interno crítico do servidor.', error: error.message });
   }
 }
-
-// Remove or rename app/api/patients.js if not used
-// For now, it's fine to keep it if it serves another purpose,
-// but it's not directly related to the UsuariosAdminTab's current functionality.

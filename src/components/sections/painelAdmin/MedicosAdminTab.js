@@ -137,13 +137,13 @@ export function MedicosAdminTab() {
     if (!isOpen) return null; // Não renderiza nada se o modal não estiver aberto
 
     return (
-      <div className="fixed inset-0 bg-slate-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-slate-600 bg-opacity-50 flex items-center justify-center z-[] p-4">
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-md">
           <Heading
             as="h3"
             text={medicoToEdit ? "Editar Médico" : "Adicionar Novo Médico"}
             colorClass="dark:text-orangeDark text-orange"
-            className="mb-4 text-xl sm:text-2xl"
+            className="mb-4 text-lg sm:text-lg text-center"
           />
           <form onSubmit={handleSubmit}>
             <div className="mb-4">

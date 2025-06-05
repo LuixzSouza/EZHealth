@@ -1,10 +1,69 @@
-// src/components/sections/painelAdmin/UsuariosAdminTab.js
 'use client';
 
 import { useState, useEffect } from "react";
 import { Heading } from "@/components/typography/Heading";
 import { ParagraphBlue } from "@/components/theme/ParagraphBlue";
 import { ButtonPrimary } from "@/components/theme/ButtonPrimary";
+
+// --- Sub-componente: Modal de Confirmação ---
+function ConfirmationModal({ isOpen, onClose, onConfirm, title, message }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-slate-600 bg-opacity-50 flex items-center justify-center z-[53] p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
+        <Heading
+          as="h3"
+          text={title}
+          colorClass="dark:text-orangeDark text-orange"
+          className="mb-4 text-xl sm:text-2xl text-center"
+        />
+        <ParagraphBlue className="mb-6 text-center text-slate-700 dark:text-slate-300">
+          {message}
+        </ParagraphBlue>
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 bg-slate-200 text-slate-800 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+          >
+            Cancelar
+          </button>
+          <ButtonPrimary onClick={onConfirm}>
+            Confirmar
+          </ButtonPrimary>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Sub-componente: Modal de Alerta/Mensagem ---
+function AlertDialog({ isOpen, onClose, title, message }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-slate-600 bg-opacity-50 flex items-center justify-center z-[54] p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
+        <Heading
+          as="h3"
+          text={title}
+          colorClass="dark:text-orangeDark text-orange"
+          className="mb-4 text-xl sm:text-2xl text-center"
+        />
+        <ParagraphBlue className="mb-6 text-center text-slate-700 dark:text-slate-300">
+          {message}
+        </ParagraphBlue>
+        <div className="flex justify-center">
+          <ButtonPrimary onClick={onClose}>
+            Entendido
+          </ButtonPrimary>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 export function UsuariosAdminTab() {
   const [pacientes, setPacientes] = useState([]);
@@ -13,43 +72,56 @@ export function UsuariosAdminTab() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pacienteToEdit, setPacienteToEdit] = useState(null); // State for patient to edit
 
+  // States for custom confirmation/alert modals
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(() => () => {}); // Function to execute on confirm
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [confirmTitle, setConfirmTitle] = useState('');
+
+  const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertTitle, setAlertTitle] = useState('');
+
+
   // --- Fetching Patient Data ---
-  useEffect(() => {
-    async function fetchPacientes() {
-      try {
-        setLoading(true);
-        setError(null);
-        // Assuming your API for triage data is at /api/triagem
-        const resp = await fetch("http://localhost:3000/api/triagem");
-        if (!resp.ok) {
-          throw new Error(`HTTP Error! status: ${resp.status}`);
-        }
-        const data = await resp.json();
-        // Extract patient data from triage records based on your provided structure
-        const extractedPatients = data.map(triage => ({
-          id: triage._id, // Use _id from triage as patient ID
-          nome: triage.dadosPessoalPaciente?.nome || "N/A", // Corrected: using 'nome' field
-          // No 'email' field in your provided data, defaulting to 'N/A'
-          email: triage.dadosPessoalPaciente?.cpf ? `${triage.dadosPessoalPaciente.cpf}@ezhealth.com` : "N/A", // Using CPF to simulate an email, or N/A
-          // The role 'Paciente' is a fixed value as it's not in your triage data
-          funcao: "Paciente",
-          status: triage.atendimentoInfo?.status || "Pendente", // Assuming a status from atendimentoInfo
-        }));
-        setPacientes(extractedPatients);
-      } catch (err) {
-        console.error("Error fetching patients:", err);
-        setError("Could not load patients. Please try again later.");
-      } finally {
-        setLoading(false);
+  const fetchPacientes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // Using relative path for API calls
+      const resp = await fetch("/api/triagem");
+      if (!resp.ok) {
+        throw new Error(`HTTP Error! status: ${resp.status}`);
       }
+      const data = await resp.json();
+      // Extract patient data from triage records
+      const extractedPatients = data.map(triage => ({
+        id: triage._id, // Use _id from triage as patient ID
+        nome: triage.dadosPessoalPaciente?.nome || "N/A",
+        // Using CPF to simulate an email, or N/A
+        email: triage.dadosPessoalPaciente?.cpf ? `${triage.dadosPessoalPaciente.cpf}@ezhealth.com` : "N/A",
+        funcao: "Paciente", // Fixed role
+        status: triage.atendimentoInfo?.status || "Pendente",
+        // Keep original triage data for PUT operation if needed
+        originalTriageData: triage
+      }));
+      setPacientes(extractedPatients);
+    } catch (err) {
+      console.error("Error fetching patients:", err);
+      setError("Não foi possível carregar os pacientes. Tente novamente mais tarde.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchPacientes();
   }, []);
 
   // --- Handlers for CRUD operations ---
 
   const handleAddPaciente = () => {
-    setPacienteToEdit(null);
+    setPacienteToEdit(null); // Ensures no patient data is pre-filled for new entry
     setIsModalOpen(true);
   };
 
@@ -61,44 +133,37 @@ export function UsuariosAdminTab() {
   const handleSavePaciente = async (pacienteData) => {
     try {
       let resp;
-      // For editing, you might need a specific API endpoint that accepts triage ID
-      // This logic assumes you're updating the original triage record
-      if (pacienteToEdit) {
-        resp = await fetch(`http://localhost:3000/api/triagem`, { // Assuming your PUT endpoint takes ID in body or as query param
+      let successMessage = "";
+
+      if (pacienteToEdit) { // Editing an existing patient (triage record)
+        resp = await fetch(`/api/triagem`, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             id: pacienteToEdit.id, // Pass the triage ID
-            // Update fields within dadosPessoalPaciente and atendimentoInfo
+            // Only send the fields that can be updated via this interface
             dadosPessoalPaciente: {
-              ...pacienteToEdit.dadosPessoalPaciente, // Keep existing fields
+              ...pacienteToEdit.originalTriageData.dadosPessoalPaciente, // Preserve existing fields
               nome: pacienteData.nome,
-              // email: pacienteData.email, // No direct email in your structure, adjust if needed
+              cpf: pacienteData.email.split('@')[0], // Re-derive CPF from email for backend
             },
             atendimentoInfo: {
-              ...pacienteToEdit.atendimentoInfo, // Keep existing fields
+              ...pacienteToEdit.originalTriageData.atendimentoInfo, // Preserve existing fields
               status: pacienteData.status,
             }
           }),
         });
-      } else {
-        // For adding a new patient, you're essentially creating a new triage record
-        resp = await fetch("http://localhost:3000/api/triagem", {
+        successMessage = "Paciente atualizado com sucesso!";
+      } else { // Adding a new patient (creating a new triage record)
+        resp = await fetch("/api/triagem", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            // Structure this to match what your POST /api/triagem expects for a new triage
             dadosPessoalPaciente: {
               nome: pacienteData.nome,
-              // If you want an email, you'll need to decide where it fits in your backend
-              // email: pacienteData.email,
-              dataNascimento: "", // Add default values for required fields
+              dataNascimento: "", // Default/empty for new patients
               idade: "",
-              cpf: pacienteData.email.split('@')[0], // Using part of email as CPF placeholder
+              cpf: pacienteData.email.split('@')[0], // Derive CPF from email
               telefone: "",
               sexo: null,
               temConvenio: "nao",
@@ -108,62 +173,70 @@ export function UsuariosAdminTab() {
             sintomasDetalhes: {},
             historico: {},
             medicamentos: {},
-            classificacaoRisco: {},
+            classificacaoRisco: {}, // Will be set by backend
             atendimentoInfo: {
                 status: pacienteData.status || "Pendente",
-                // createdAt will be handled by the backend
             }
           }),
         });
+        successMessage = "Paciente adicionado com sucesso!";
       }
 
       if (!resp.ok) {
-        throw new Error(`HTTP Error! status: ${resp.status}`);
+        const errorData = await resp.json();
+        throw new Error(errorData.message || `HTTP Error! Status: ${resp.status}`);
       }
 
-      // Re-fetch the list to ensure UI is updated
-      const updatedData = await fetch("http://localhost:3000/api/triagem").then(res => res.json());
-      const updatedPatientsList = updatedData.map(triage => ({
-        id: triage._id,
-        nome: triage.dadosPessoalPaciente?.nome || "N/A",
-        email: triage.dadosPessoalPaciente?.cpf ? `${triage.dadosPessoalPaciente.cpf}@ezhealth.com` : "N/A", // Re-derive email
-        funcao: "Paciente",
-        status: triage.atendimentoInfo?.status || "Pendente",
-      }));
-      setPacientes(updatedPatientsList);
-      alert(pacienteToEdit ? "Patient updated successfully!" : "Patient added successfully!");
+      setAlertTitle("Sucesso!");
+      setAlertMessage(successMessage);
+      setIsAlertDialogOpen(true);
 
+      fetchPacientes(); // Re-fetch the list to ensure UI is updated
     } catch (err) {
       console.error("Error saving patient:", err);
-      alert("Could not save patient.");
+      setAlertTitle("Erro!");
+      setAlertMessage("Não foi possível salvar o paciente: " + err.message);
+      setIsAlertDialogOpen(true);
     } finally {
-      setIsModalOpen(false);
-      setPacienteToEdit(null);
+      setIsModalOpen(false); // Close edit/add modal
+      setPacienteToEdit(null); // Clear edited patient data
     }
   };
 
-  const handleRemovePaciente = async (id) => {
-    if (!confirm("Are you sure you want to remove this patient?")) return;
-    try {
-      // Assuming your DELETE endpoint takes ID as a query parameter
-      const resp = await fetch(`http://localhost:3000/api/triagem?id=${id}`, {
-        method: "DELETE"
-      });
-      if (!resp.ok) {
-        throw new Error(`Status: ${resp.status}`);
+  const handleRemovePaciente = (id) => {
+    setConfirmTitle("Confirmar Exclusão");
+    setConfirmMessage("Tem certeza que deseja remover este paciente? Esta ação é irreversível.");
+    setConfirmAction(() => async () => {
+      try {
+        const resp = await fetch(`/api/triagem?id=${id}`, {
+          method: "DELETE"
+        });
+        if (!resp.ok) {
+          const errorData = await resp.json();
+          throw new Error(errorData.message || `Status: ${resp.status}`);
+        }
+
+        setAlertTitle("Sucesso!");
+        setAlertMessage("Paciente removido com sucesso!");
+        setIsAlertDialogOpen(true);
+
+        fetchPacientes(); // Re-fetch the list to update UI
+      } catch (err) {
+        console.error("Error removing patient:", err);
+        setAlertTitle("Erro!");
+        setAlertMessage("Não foi possível remover o paciente: " + err.message);
+        setIsAlertDialogOpen(true);
+      } finally {
+        setIsConfirmModalOpen(false); // Close confirmation modal
       }
-      setPacientes(prev => prev.filter(p => p.id !== id));
-      alert("Patient removed successfully!");
-    } catch (err) {
-      console.error("Error removing patient:", err);
-      alert("Could not remove patient.");
-    }
+    });
+    setIsConfirmModalOpen(true);
   };
 
   // --- Modal Component (defined internally) ---
   function PatientFormModal({ isOpen, onClose, onSave, pacienteToEdit }) {
     const [nome, setNome] = useState(pacienteToEdit?.nome || '');
-    const [email, setEmail] = useState(pacienteToEdit?.email || ''); // Retained for UX, but actual saving might ignore it
+    const [email, setEmail] = useState(pacienteToEdit?.email || ''); // Retained for UX
     const [status, setStatus] = useState(pacienteToEdit?.status || 'Pendente');
 
     useEffect(() => {
@@ -176,22 +249,20 @@ export function UsuariosAdminTab() {
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-      // Only passing 'nome' and 'status' directly to onSave,
-      // as 'email' isn't a direct field in your data structure.
-      const pacientePayload = { nome, status, email }; // Pass email for backend to parse if needed
-      await onSave(pacientePayload);
+      // Pass 'email' so backend can potentially derive CPF from it
+      await onSave({ nome, status, email });
     };
 
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-slate-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-slate-600 bg-opacity-50 flex items-center justify-center z-[52] p-4">
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-md">
           <Heading
             as="h3"
             text={pacienteToEdit ? "Editar Paciente" : "Adicionar Novo Paciente"}
             colorClass="dark:text-orangeDark text-orange"
-            className="mb-4 text-xl sm:text-2xl"
+            className="mb-4 text-lg sm:text-lg text-center"
           />
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
@@ -342,11 +413,29 @@ export function UsuariosAdminTab() {
         <p className="text-slate-500 dark:text-slate-400 text-center py-6 sm:py-8 text-sm sm:text-base">Nenhum paciente cadastrado.</p>
       )}
 
+      {/* Renderiza o modal de formulário */}
       <PatientFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSavePaciente}
         pacienteToEdit={pacienteToEdit}
+      />
+
+      {/* Renderiza o modal de confirmação */}
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={confirmAction}
+        title={confirmTitle}
+        message={confirmMessage}
+      />
+
+      {/* Renderiza o modal de alerta */}
+      <AlertDialog
+        isOpen={isAlertDialogOpen}
+        onClose={() => setIsAlertDialogOpen(false)}
+        title={alertTitle}
+        message={alertMessage}
       />
     </div>
   );

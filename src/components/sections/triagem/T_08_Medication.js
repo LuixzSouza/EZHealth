@@ -14,7 +14,7 @@ export function T_08_Medication({ onNext, defaultValues }) {
   };
 
   return (
-    <section className="pt-8 flex items-center justify-center w-full bg-gray-50 px-4">
+    <section className="pt-8 flex items-center justify-center w-full bg-zinc-50 dark:bg-themeDark px-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white/10 shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"
@@ -34,7 +34,7 @@ export function T_08_Medication({ onNext, defaultValues }) {
           {['sim', 'nao'].map((val) => (
             <label
               key={val}
-              className="flex items-center gap-3 p-3 border border-gray-300 rounded-md cursor-pointer
+              className="flex items-center gap-3 p-3 border border-zinc-300 rounded-md cursor-pointer
                          text-black dark:text-white transition-all hover:border-orange
                          peer-checked:border-orange peer-checked:bg-orange peer-checked:text-white"
             >
@@ -58,7 +58,7 @@ export function T_08_Medication({ onNext, defaultValues }) {
             <div className="mt-4">
               <label
                 htmlFor="quaisMedicamentos"
-                className="block text-gray-800 font-semibold mb-1 text-black dark:text-white"
+                className="block text-zinc-800 font-semibold mb-1 text-black dark:text-white"
               >
                 Qual(is)?
               </label>
@@ -67,7 +67,7 @@ export function T_08_Medication({ onNext, defaultValues }) {
                 id="quaisMedicamentos"
                 {...register('medicamentos.quaisMedicamentos')}
                 placeholder="Digite os nomes..."
-                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange text-black dark:text-white bg-white dark:bg-gray-800"
+                className="w-full border border-zinc-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange text-black dark:text-white bg-white dark:bg-zinc-800"
               />
             </div>
           )}

@@ -52,7 +52,7 @@ export function T_03_CheckInSect({ onNext, defaultValues }) {
               {['Masculino', 'Feminino', 'Outro', 'Prefiro não informar'].map((option, index) => (
                 <label
                   key={option}
-                  className="flex items-center gap-3 p-3 border border-gray-300 rounded-md cursor-pointer hover:border-orange transition-all
+                  className="flex items-center gap-3 p-3 border border-zinc-300 rounded-md cursor-pointer hover:border-orange transition-all
                             peer-checked:border-orange peer-checked:bg-orange peer-checked:text-white text-black dark:text-white"
                 >
                   <input

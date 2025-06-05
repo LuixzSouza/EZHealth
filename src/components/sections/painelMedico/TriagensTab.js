@@ -17,7 +17,7 @@ export function TriagensTab() {
     Amarelo: "bg-yellow-400 text-black",
     Verde: "bg-green-500 text-white",
     Azul: "bg-blue-500 text-white",
-    gray: "bg-gray-300 text-gray-800",
+    gray: "bg-zinc-300 text-zinc-800",
   };
 
   function calculaTempoEspera(createdAtDate) {
@@ -44,6 +44,7 @@ export function TriagensTab() {
         const data = await response.json();
 
         const formattedTriagens = data.map(triagem => {
+          // Usar optional chaining ao acessar dadosPessoalPaciente
           const patientName = triagem.dadosPessoalPaciente?.nome || 'Paciente Desconhecido';
 
           const urgencyClassification = triagem.classificacaoRisco || {
@@ -52,7 +53,8 @@ export function TriagensTab() {
             time: ''
           };
 
-          const createdAtDate = new Date(triagem.createdAt);
+          // Garante que createdAt é um Date válido
+          const createdAtDate = triagem.createdAt ? new Date(triagem.createdAt) : new Date(); // Fallback para new Date() se createdAt estiver faltando
 
           return {
             id: triagem._id,
@@ -62,9 +64,12 @@ export function TriagensTab() {
             urgencyTime: urgencyClassification.time,
             createdAt: createdAtDate,
             timeWaiting: calculaTempoEspera(createdAtDate),
-            fullTriagemData: triagem
+            fullTriagemData: triagem // Guarda o objeto original completo se necessário
           };
-        });
+        })
+        // Filtra triagens que já possuem atendimentoInfo.status === 'Finalizado' ou similar, se desejar mostrar apenas 'pendentes'
+        // Por exemplo, se 'triagensPendentes' significa "não atribuídas" ou "não finalizadas":
+        .filter(triagem => triagem.fullTriagemData.atendimentoInfo?.status !== 'Finalizado' && triagem.fullTriagemData.atendimentoInfo?.status !== 'Em Atendimento');
 
         setPendingTriagens(formattedTriagens);
       } catch (err) {
@@ -76,11 +81,27 @@ export function TriagensTab() {
     }
 
     fetchTriagens();
-  }, []);
+
+    // Limpar o intervalo ao desmontar o componente
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []); // Vazio para executar apenas uma vez na montagem
 
   useEffect(() => {
-    if (loading || pendingTriagens.length === 0) return;
+    // Só inicia o intervalo se o carregamento terminou e há triagens
+    if (loading || pendingTriagens.length === 0) {
+      if (intervalRef.current) { // Limpa se as condições não forem mais atendidas
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
 
+    // Inicia o intervalo se ainda não estiver ativo
     if (!intervalRef.current) {
       intervalRef.current = setInterval(() => {
         setPendingTriagens(prev =>
@@ -89,16 +110,17 @@ export function TriagensTab() {
             timeWaiting: calculaTempoEspera(item.createdAt)
           }))
         );
-      }, 60_000);
+      }, 60_000); // Atualiza a cada 1 minuto (60 segundos)
     }
 
+    // Limpeza ao desmontar ou quando as dependências mudam
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, [loading, pendingTriagens]);
+  }, [loading, pendingTriagens.length]); // Depende de loading e do número de triagens
 
   const handleStartTriagem = (triagemId) => {
     router.push(`/painel-medico/${triagemId}`);
@@ -106,6 +128,8 @@ export function TriagensTab() {
 
   const handleNewTriagem = () => {
     alert("Abrir formulário para adicionar nova triagem manual!");
+    // Aqui você pode redirecionar para uma página de novo formulário de triagem
+    // router.push('/painel-medico/nova-triagem');
   };
 
   return (
@@ -127,7 +151,7 @@ export function TriagensTab() {
       </div>
 
       {loading ? (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">
+        <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base">
           Carregando triagens...
         </p>
       ) : error ? (
@@ -136,31 +160,37 @@ export function TriagensTab() {
         </p>
       ) : pendingTriagens.length > 0 ? (
         <div className="overflow-x-auto rounded-lg shadow">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+          <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+            <thead className="bg-zinc-50 dark:bg-zinc-700">
               <tr>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Paciente
                 </th>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Urgência
                 </th>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Tempo de Espera
+                </th>
+                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
+                  Responsável
                 </th>
                 <th className="relative px-3 py-2 sm:px-6 sm:py-3">
                   <span className="sr-only">Ações</span>
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-white/10 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-white dark:bg-white/10 divide-y divide-zinc-200 dark:divide-zinc-700">
               {pendingTriagens.map((triagem) => {
                 const badgeClass = colorClasses[triagem.urgencyColor] || colorClasses.gray;
+
+                // Definindo o nome do médico de forma segura
+                const medicoNome = triagem.fullTriagemData.atendimentoInfo?.medico?.nome || 'Não Atribuído';
 
                 return (
                   <tr
                     key={triagem.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    className="hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                   >
                     <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-DarkBlue dark:text-white">
                       {triagem.patient}
@@ -174,8 +204,13 @@ export function TriagensTab() {
                       </span>
                     </td>
 
-                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">
                       {triagem.timeWaiting}
+                    </td>
+
+                    {/* AQUI ESTÁ A CORREÇÃO PRINCIPAL */}
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-DarkBlue dark:text-white">
+                      {medicoNome}
                     </td>
 
                     <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -193,7 +228,7 @@ export function TriagensTab() {
           </table>
         </div>
       ) : (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">
+        <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base">
           Nenhuma triagem pendente no momento.
         </p>
       )}

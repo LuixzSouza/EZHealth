@@ -62,21 +62,21 @@ export function RelatoriosTab() {
       </div>
 
       {loading ? (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">Carregando relatórios...</p>
+        <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base">Carregando relatórios...</p>
       ) : error ? (
         <p className="text-red-500 dark:text-red-400 text-center py-6 sm:py-8 text-sm sm:text-base">{error}</p>
       ) : reports.length > 0 ? (
         <div className="overflow-x-auto rounded-lg shadow">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+          <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+            <thead className="bg-zinc-50 dark:bg-zinc-700">
               <tr>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Tipo
                 </th>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Paciente
                 </th>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Data
                 </th>
                 <th scope="col" className="relative px-3 py-2 sm:px-6 sm:py-3">
@@ -84,16 +84,16 @@ export function RelatoriosTab() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-white/10 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-white dark:bg-white/10 divide-y divide-zinc-200 dark:divide-zinc-700">
               {reports.map((report) => (
-                <tr key={report.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                <tr key={report.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
                   <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-DarkBlue dark:text-white">
                     {report.type}
                   </td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">
                     {report.patient}
                   </td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">
                     {new Date(report.date).toLocaleDateString('pt-BR')}
                   </td>
                   <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -110,7 +110,7 @@ export function RelatoriosTab() {
           </table>
         </div>
       ) : (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">Nenhum relatório disponível.</p>
+        <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base">Nenhum relatório disponível.</p>
       )}
     </div>
   );

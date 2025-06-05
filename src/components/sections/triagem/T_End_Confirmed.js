@@ -25,6 +25,7 @@ export function T_End_Confirmed({ formData }) {
       // In a real application, it might not be necessary or could be adjusted.
       const timer = setTimeout(async () => {
         try {
+          // CORREÇÃO AQUI: Usando caminho relativo para a API de triagem
           const response = await fetch("/api/triagem", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -45,12 +46,12 @@ export function T_End_Confirmed({ formData }) {
           );
 
           if (result.triagemCompleta) {
-            setSenhaExibida(result.triagemCompleta.atendimentoInfo?.senha || "");
-            setSalaExibida(result.triagemCompleta.atendimentoInfo?.sala || "");
+            setSenhaExibida(result.triagemCompleta.atendimentoInfo?.senha || "N/A"); // Fallback N/A
+            setSalaExibida(result.triagemCompleta.atendimentoInfo?.sala || "N/A"); // Fallback N/A
             setMedicoExibido(
               result.triagemCompleta.atendimentoInfo?.medico || {
-                nome: "",
-                foto: "",
+                nome: "Não Atribuído", // Fallback nome
+                foto: "/icons/medico-avatar.svg", // Fallback foto
               }
             );
             setClassificacaoExibida(
@@ -89,7 +90,7 @@ export function T_End_Confirmed({ formData }) {
             {classificacaoExibida && (
               <div
                 className={`p-4 rounded-lg text-white font-bold text-xl w-full`}
-                style={{ backgroundColor: classificacaoExibida.color.toLowerCase() }}
+                style={{ backgroundColor: classificacaoExibida.color }}
               >
                 Classificação: {classificacaoExibida.label} - Atendimento{" "}
                 {classificacaoExibida.time}
@@ -113,15 +114,13 @@ export function T_End_Confirmed({ formData }) {
 
               <div className="bg-white/10 rounded-xl shadow-md p-4 flex flex-col items-center gap-2">
                 <p className="text-orange text-lg font-semibold">Médico(a):</p>
-                {medicoExibido.foto && (
-                  <Image
-                    width={96}
-                    height={96}
-                    src={medicoExibido.foto}
-                    alt={medicoExibido.nome}
-                    className="w-24 h-24 rounded-full object-cover shadow"
-                  />
-                )}
+                <Image
+                  width={96}
+                  height={96}
+                  src={medicoExibido.foto || "/icons/medico-avatar.svg"}
+                  alt={medicoExibido.nome}
+                  className="w-24 h-24 rounded-full object-cover shadow"
+                />
                 <p className="text-2xl text-blue-900 dark:text-white font-bold">
                   {medicoExibido.nome}
                 </p>

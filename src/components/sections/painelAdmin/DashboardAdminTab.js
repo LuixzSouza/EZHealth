@@ -26,7 +26,7 @@ function StatCard({ label, value, description }) {
     <div className="bg-blue-100 text-blue-900 dark:bg-white/10 dark:text-themeTextDark rounded-xl p-3 sm:p-4 text-center shadow">
       <div className="text-2xl sm:text-3xl font-bold">{value}</div>
       <div className="text-xs sm:text-sm mt-1">{label}</div>
-      {description && <p className="text-gray-500 text-xs mt-1 hidden sm:block">{description}</p>} {/* Descrição opcional, oculta em mobile */}
+      {description && <p className="text-zinc-500 text-xs mt-1 hidden sm:block">{description}</p>} {/* Descrição opcional, oculta em mobile */}
     </div>
   );
 }
@@ -60,9 +60,9 @@ export function DashboardAdminTab() {
             <h4 className="text-base sm:text-lg font-semibold text-blue-900 dark:text-orange flex items-center gap-2">
               📈 Novos Cadastros por Mês
             </h4>
-            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 sm:mt-0">Últimos 5 meses</span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 sm:mt-0">Últimos 5 meses</span>
           </div>
-          <div className="w-full h-56 text-black dark:text-gray-300">
+          <div className="w-full h-56 text-black dark:text-zinc-300">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={dadosCadastros}>
                 <XAxis dataKey="mes" stroke="#9ca3af" tick={{ fill: 'currentColor', fontSize: 12 }} />
@@ -82,9 +82,9 @@ export function DashboardAdminTab() {
             <h4 className="text-base sm:text-lg font-semibold text-blue-900 dark:text-orange flex items-center gap-2">
               📊 Atividade Diária
             </h4>
-            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 sm:mt-0">Média de atividades na semana</span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 sm:mt-0">Média de atividades na semana</span>
           </div>
-          <div className="w-full h-56 text-black dark:text-gray-300">
+          <div className="w-full h-56 text-black dark:text-zinc-300">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dadosAtividade}>
                 <XAxis dataKey="dia" stroke="#9ca3af" tick={{ fill: 'currentColor', fontSize: 12 }} />

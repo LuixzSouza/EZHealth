@@ -24,7 +24,7 @@ export function T_05_SymptomsDirector({ onNext, defaultValues }) {
   ];
 
   return (
-    <section className="pt-8 flex items-center justify-center w-full bg-gray-50 px-4">
+    <section className="pt-8 flex items-center justify-center w-full bg-zinc-50 dark:bg-themeDark px-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white/10 shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"
@@ -40,7 +40,7 @@ export function T_05_SymptomsDirector({ onNext, defaultValues }) {
           {symptomOptions.map((symptom) => (
             <label
               key={symptom.name}
-              className="flex items-center gap-3 p-3 border border-gray-300 rounded-md cursor-pointer transition-all
+              className="flex items-center gap-3 p-3 border border-zinc-300 rounded-md cursor-pointer transition-all
                         hover:border-orange peer-checked:border-orange peer-checked:bg-orange peer-checked:text-white text-black dark:text-white"
             >
               <input
@@ -54,7 +54,7 @@ export function T_05_SymptomsDirector({ onNext, defaultValues }) {
 
           {/* Campo "Outros" */}
           <div className="mt-4">
-            <label htmlFor="sintomas.outros" className="block text-gray-800 font-semibold mb-1">
+            <label htmlFor="sintomas.outros" className="block text-zinc-800 font-semibold mb-1">
               Outros sintomas:
             </label>
             <input
@@ -62,7 +62,7 @@ export function T_05_SymptomsDirector({ onNext, defaultValues }) {
               id="sintomas.outros"
               {...register('sintomas.outros')}
               placeholder="Descreva aqui..."
-              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange text-black"
+              className="w-full border border-zinc-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-orange text-black"
             />
           </div>
         </div>

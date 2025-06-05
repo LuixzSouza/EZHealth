@@ -6,9 +6,9 @@ import Link from 'next/link'; // Import Link for navigation
 async function getTriagemById(id) {
   try {
     // IMPORTANT: Para um ambiente de produção, use process.env.NEXT_PUBLIC_API_BASE_URL
-    // Como você especificou 'http://localhost:3000', vou manter para este exemplo.
+    // Como você especificou '', vou manter para este exemplo.
     // Em um ambiente real, você faria: `const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/triagem/${id}`, {`
-    const res = await fetch(`http://localhost:3000/api/triagem/${id}`, {
+    const res = await fetch(`/api/triagem/${id}`, {
       cache: "no-store", // Evita cache para sempre buscar dados atualizados
     });
 
@@ -33,12 +33,12 @@ export default async function TriagemDetalhePage({ params }) {
   // Renderiza a página de erro para ID inválido
   if (!id) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 p-6">
-        <div className="bg-white dark:bg-zinc-700 p-8 rounded-lg shadow-xl text-center max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 to-indigo-100 dark:from-slate-800 dark:to-zinc-950 p-6">
+        <div className="bg-white dark:bg-slate-700 p-8 rounded-lg shadow-xl text-center max-w-md w-full">
           <h2 className="text-2xl font-bold text-red-500 mb-4">ID Inválido</h2>
-          <p className="text-gray-700 dark:text-zinc-200">
+          <p className="text-zinc-700 dark:text-zinc-200">
             Por favor, forneça um ID de triagem válido na URL (ex:{" "}
-            <code className="bg-gray-100 dark:bg-zinc-600 p-1 rounded">
+            <code className="bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 p-1 rounded">
               /painel-medico/&lt;id&gt;
             </code>
             ).
@@ -53,14 +53,14 @@ export default async function TriagemDetalhePage({ params }) {
   // Renderiza a página de erro se a triagem não for encontrada
   if (!triagem) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 p-6">
-        <div className="bg-white dark:bg-zinc-700 p-8 rounded-lg shadow-xl text-center max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 to-indigo-100 dark:from-slate-800 dark:to-zinc-950 p-6">
+        <div className="bg-white dark:bg-slate-700 p-8 rounded-lg shadow-xl text-center max-w-md w-full">
           <h2 className="text-2xl font-bold text-red-500 mb-4">
             Triagem Não Encontrada
           </h2>
-          <p className="text-gray-700 dark:text-zinc-200">
+          <p className="text-zinc-700 dark:text-zinc-200">
             Não foi possível carregar os detalhes da triagem com o ID{" "}
-            <span className="font-semibold text-gray-900 dark:text-white">
+            <span className="font-semibold text-zinc-900 dark:text-white">
               {id}
             </span>
             . Por favor, verifique o ID e tente novamente.
@@ -88,7 +88,7 @@ export default async function TriagemDetalhePage({ params }) {
 
   const classificacao = {
     label: classificacaoRisco.label || "Não Classificado",
-    color: classificacaoRisco.color || "gray",
+    color: classificacaoRisco.color || "zinc", // Alterado de 'gray' para 'zinc' como fallback
     time: classificacaoRisco.time || "Não informado",
   };
 
@@ -152,16 +152,17 @@ export default async function TriagemDetalhePage({ params }) {
   const riskColorMap = {
     Vermelho: "bg-red-600 text-white",
     Laranja: "bg-orange-600 text-white",
-    Amarelo: "bg-yellow-500 text-black", // Amarelo geralmente combina melhor com texto escuro
+    Amarelo: "bg-yellow-500 text-zinc-950", // Amarelo geralmente combina melhor com texto escuro
     Verde: "bg-green-600 text-white",
-    Azul: "bg-blue-600 text-white",
-    gray: "bg-zinc-400 text-zinc-800", // Usando zinc para dark mode compatível
+    Azul: "bg-zinc-600 text-white",
+    // Cor padrão para 'Não Classificado' ou fallback
+    zinc: "bg-zinc-400 text-zinc-950", // Usando um tom de azul para substituir o cinza
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-indigo-100 dark:from-slate-800 dark:to-zinc-950 pb-8">
       {/* Header de Navegação */}
-      <header className="bg-blue-600 dark:bg-blue-900 text-white p-4 shadow-md sticky top-0 z-10">
+      <header className="bg-zinc-600 dark:bg-zinc-900 text-white p-4 shadow-md sticky top-0 z-10">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <Link href="/painel-medico" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <svg
@@ -184,7 +185,7 @@ export default async function TriagemDetalhePage({ params }) {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl overflow-hidden mt-8">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden mt-8">
         {/* Header com Título e Classificação de Risco */}
         <div className="bg-gradient-to-r from-orange-500 to-red-500 dark:from-orange-700 dark:to-red-700 text-white p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold mb-4 sm:mb-0">
@@ -192,7 +193,7 @@ export default async function TriagemDetalhePage({ params }) {
           </h1>
           <div
             className={`inline-flex items-center px-5 py-2 rounded-full text-lg font-bold shadow-md ${
-              riskColorMap[classificacao.color] || riskColorMap.gray
+              riskColorMap[classificacao.color] || riskColorMap.zinc // Fallback para 'zinc'
             }`}
           >
             {classificacao.label} (Atendimento {classificacao.time})
@@ -234,7 +235,7 @@ export default async function TriagemDetalhePage({ params }) {
 
           {/* Sintomas Relatados */}
           <InfoCard title="Sintomas Relatados" fullWidth>
-            <p className="text-base text-gray-700 dark:text-zinc-300 leading-relaxed">
+            <p className="text-base text-zinc-700 dark:text-zinc-200 leading-relaxed">
               {sintomasTexto}
             </p>
           </InfoCard>
@@ -285,14 +286,14 @@ export default async function TriagemDetalhePage({ params }) {
 function InfoCard({ title, children, fullWidth = false }) {
   return (
     <div
-      className={`bg-gray-50 dark:bg-zinc-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-600 ${
+      className={`bg-zinc-50 dark:bg-zinc-800 p-5 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 ${
         fullWidth ? "md:col-span-2" : ""
       }`}
     >
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-zinc-100 mb-3 border-b pb-2 border-gray-200 dark:border-zinc-600">
+      <h2 className="text-xl font-semibold text-zinc-800 dark:text-white mb-3 border-b pb-2 border-zinc-200 dark:border-zinc-700">
         {title}
       </h2>
-      <div className="text-gray-700 dark:text-zinc-300 text-sm">
+      <div className="text-zinc-700 dark:text-zinc-200 text-sm">
         {children}
       </div>
     </div>

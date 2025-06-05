@@ -53,3 +53,143 @@ html {
     }
   }
 }
+
+/* Seu arquivo globals.css */
+
+/* ... (seus estilos Tailwind CSS e outros estilos existentes) ... */
+
+/* Defina as variáveis de alto contraste */
+html.high-contrast-mode {
+  /* Cores base para alto contraste */
+  --hc-text: #ffffff;      /* Texto principal: branco puro */
+  --hc-background: #000000; /* Fundo principal: preto puro */
+  --hc-border: #ffffff;    /* Bordas: branco puro */
+  --hc-link: #ffff00;      /* Links: amarelo vibrante */
+  --hc-accent: #00ffff;    /* Cor de destaque: ciano */
+  --hc-red: #ff0000;       /* Vermelho (para erros/alertas) */
+  --hc-green: #00ff00;     /* Verde (para sucesso) */
+
+  /* Aplica as cores globais */
+  background-color: var(--hc-background) !important;
+  color: var(--hc-text) !important;
+}
+
+/* Sobrescrever cores de texto e fundo para elementos comuns */
+html.high-contrast-mode body,
+html.high-contrast-mode div,
+html.high-contrast-mode p,
+html.high-contrast-mode span,
+html.high-contrast-mode h1,
+html.high-contrast-mode h2,
+html.high-contrast-mode h3,
+html.high-contrast-mode h4,
+html.high-contrast-mode h5,
+html.high-contrast-mode h6,
+html.high-contrast-mode label {
+  color: var(--hc-text) !important;
+  background-color: transparent !important; /* Reseta backgrounds se eles herdarem */
+}
+
+html.high-contrast-mode a {
+  color: var(--hc-link) !important;
+  text-decoration: underline !important; /* Garante que links sejam sublinhados */
+}
+
+/* Botões */
+html.high-contrast-mode button {
+  background-color: #333 !important; /* Fundo escuro para botões */
+  color: var(--hc-text) !important;
+  border: 1px solid var(--hc-border) !important;
+}
+
+/* Inputs, Selects, Textareas */
+html.high-contrast-mode input,
+html.high-contrast-mode select,
+html.high-contrast-mode textarea {
+  background-color: #333 !important;
+  color: var(--hc-text) !important;
+  border: 1px solid var(--hc-border) !important;
+}
+
+/* Elementos com bordas claras */
+html.high-contrast-mode .border,
+html.high-contrast-mode .border-b,
+html.high-contrast-mode .border-2 {
+  border-color: var(--hc-border) !important;
+}
+
+/* Cartões/Backgrounds específicos */
+html.high-contrast-mode .bg-white,
+html.high-contrast-mode .bg-blue-100 { /* Exemplo: seu StatCard */
+  background-color: #111 !important; /* Fundo escuro para elementos de destaque */
+  border: 1px solid var(--hc-border) !important;
+}
+
+/* Toggles (CustomToggleSwitch) */
+html.high-contrast-mode .bg-neutral-300 { /* Fundo do toggle desativado */
+  background-color: #555 !important;
+}
+html.high-contrast-mode .dark\:bg-neutral-700 { /* Fundo do toggle desativado (dark) */
+  background-color: #555 !important;
+}
+html.high-contrast-mode .peer-checked\:bg-orange-600 { /* Fundo do toggle ativado */
+  background-color: var(--hc-accent) !important; /* Usa cor de destaque */
+}
+html.high-contrast-mode .after\:bg-white { /* Círculo do toggle */
+  background-color: var(--hc-text) !important;
+}
+html.high-contrast-mode .after\:border-neutral-300 {
+  border-color: var(--hc-border) !important;
+}
+
+/* Classes Tailwind específicas para alto contraste */
+html.high-contrast-mode .text-orange,
+html.high-contrast-mode .dark\:text-orangeDark,
+html.high-contrast-mode .text-orange-600,
+html.high-contrast-mode .dark\:text-orange-400 {
+  color: var(--hc-link) !important; /* Links e textos de destaque em amarelo */
+}
+
+html.high-contrast-mode .text-blue-900,
+html.high-contrast-mode .text-blue-800 {
+  color: var(--hc-text) !important; /* Textos de cabeçalho em branco */
+}
+
+html.high-contrast-mode .text-red-500,
+html.high-contrast-mode .dark\:text-red-400 {
+  color: var(--hc-red) !important; /* Erros em vermelho vibrante */
+}
+
+html.high-contrast-mode .text-green-600,
+html.high-contrast-mode .dark\:text-green-400 {
+  color: var(--hc-green) !important; /* Sucesso em verde vibrante */
+}
+
+html.high-contrast-mode .text-gray-500, /* Notificações, textos informativos */
+html.high-contrast-mode .dark\:text-gray-400,
+html.high-contrast-mode .text-neutral-500,
+html.high-contrast-mode .dark\:text-neutral-400 {
+  color: var(--hc-text) !important;
+}
+
+/* Botões */
+html.high-contrast-mode .bg-blue-600,
+html.high-contrast-mode .hover\:bg-blue-700 {
+  background-color: var(--hc-accent) !important;
+  color: var(--hc-background) !important; /* Texto preto para botões ciano */
+}
+html.high-contrast-mode .bg-red-600,
+html.high-contrast-mode .hover\:bg-red-700 {
+  background-color: var(--hc-red) !important;
+  color: var(--hc-background) !important;
+}
+html.high-contrast-mode .bg-orange-600,
+html.high-contrast-mode .hover\:bg-orange-700 {
+  background-color: var(--hc-link) !important; /* Botão de triagem em amarelo */
+  color: var(--hc-background) !important;
+}
+html.high-contrast-mode .bg-green-600,
+html.high-contrast-mode .hover\:bg-green-700 {
+  background-color: var(--hc-green) !important;
+  color: var(--hc-background) !important;
+}

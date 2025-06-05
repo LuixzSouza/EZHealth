@@ -18,7 +18,7 @@ export function PacientesTab() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`http://localhost:3000/api/triagem`, {
+        const response = await fetch(`/api/triagem`, {
           cache: "no-store",
         });
 
@@ -96,7 +96,7 @@ export function PacientesTab() {
       </ParagraphBlue>
 
       {loading ? (
-        <p className="text-gray-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-lg" aria-live="polite">
+        <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-lg" aria-live="polite">
           Carregando histórico de triagens...
         </p>
       ) : error ? (
@@ -105,22 +105,22 @@ export function PacientesTab() {
         </p>
       ) : triagensSummaries.length > 0 ? (
         <div className="overflow-x-auto rounded-lg shadow-lg">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
-            <thead className="bg-gray-100 dark:bg-zinc-700">
+          <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+            <thead className="bg-zinc-100 dark:bg-zinc-700">
               <tr>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">
                   Paciente
                 </th>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">
                   Idade
                 </th>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">
                   Gênero
                 </th>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">
                   Última Triagem
                 </th>
-                 <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wider">
+                 <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">
                   Nº de Triagens
                 </th>
                 <th className="relative px-3 py-2 sm:px-6 sm:py-3">
@@ -128,25 +128,25 @@ export function PacientesTab() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
+            <tbody className="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
               {triagensSummaries.map((patientSummary) => (
                 <tr
                   key={patientSummary.linkTriageId} // Use a unique ID for the key
-                  className="hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors duration-200 ease-in-out"
+                  className="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors duration-200 ease-in-out"
                 >
                   <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-blue-900 dark:text-white">
                     {patientSummary.name}
                   </td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600 dark:text-zinc-300">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">
                     {patientSummary.age}
                   </td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600 dark:text-zinc-300">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">
                     {patientSummary.gender}
                   </td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600 dark:text-zinc-300">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">
                     {patientSummary.lastTriageDate ? patientSummary.lastTriageDate.toLocaleDateString("pt-BR") : "N/A"}
                   </td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600 dark:text-zinc-300">
+                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">
                     {patientSummary.triageCount}
                   </td>
                   <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -164,7 +164,7 @@ export function PacientesTab() {
           </table>
         </div>
       ) : (
-        <p className="text-gray-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-lg" aria-live="polite">
+        <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-lg" aria-live="polite">
           Nenhum paciente com histórico de triagens encontrado.
         </p>
       )}

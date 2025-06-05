@@ -173,10 +173,10 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
   };
 
   return (
-    <section className="pt-8 flex items-center justify-center w-full bg-gray-50 px-4">
+    <section className="pt-8 flex items-center justify-center w-full bg-zinc-50 dark:bg-themeDark px-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md dark:bg-gray-900"
+        className="bg-white shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md dark:bg-zinc-900"
       >
         <Heading as="h2" text="Sinais Vitais" colorClass="dark:text-orangeDark text-orange" />
 
@@ -187,7 +187,7 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
         {/* Exibição Dinâmica do Estado e Gráfico */}
         <div
           className={`text-center py-4 rounded-md transition-colors duration-300 relative overflow-hidden
-            ${measurementState === 'idle' ? 'bg-gray-100 border border-gray-300 text-gray-800 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200' : ''}
+            ${measurementState === 'idle' ? 'bg-zinc-100 border border-zinc-300 text-zinc-800 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200' : ''}
             ${measurementState === 'connecting' ? 'bg-blue-100 border border-blue-300 text-blue-800 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-200' : ''}
             ${measurementState === 'measuring' ? 'bg-orange-100 border border-orange-300 text-orange-800 dark:bg-orange-900 dark:border-orange-700 dark:text-orange-200' : ''}
             ${measurementState === 'complete' ? 'bg-green-100 border border-green-300 text-green-800 dark:bg-green-900 dark:border-green-700 dark:text-green-200' : ''}
@@ -196,7 +196,7 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
           {measurementState === 'idle' && (
             <span className="flex items-center justify-center text-lg font-medium">
               <svg
-                className="h-6 w-6 mr-2 text-gray-500"
+                className="h-6 w-6 mr-2 text-zinc-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -256,7 +256,7 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
               </span>
               {/* Gráfico Simulado */}
               <svg
-                className="w-full h-20 bg-white dark:bg-gray-800 rounded-md"
+                className="w-full h-20 bg-white dark:bg-zinc-800 rounded-md"
                 viewBox="0 0 250 100"
               >
                 <rect x="0" y="0" width="250" height="100" fill="transparent" />
@@ -303,7 +303,7 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
           <div>
             <label
               htmlFor="temperatura"
-              className="block text-gray-800 font-semibold mb-1 dark:text-gray-200"
+              className="block text-zinc-800 font-semibold mb-1 dark:text-zinc-200"
             >
               Temperatura corporal (°C):
             </label>
@@ -321,8 +321,8 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
               className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 ${
                 errors.sinaisVitais?.temperatura
                   ? 'border-red-500 focus:ring-red-300'
-                  : 'border-gray-300 focus:ring-orange'
-              } text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                  : 'border-zinc-300 focus:ring-orange'
+              } text-black dark:bg-zinc-700 dark:border-zinc-600 dark:text-white`}
               value={
                 measurementState === 'measuring'
                   ? displayValues.temperatura == null
@@ -349,7 +349,7 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
           <div>
             <label
               htmlFor="pressao"
-              className="block text-gray-800 font-semibold mb-1 dark:text-gray-200"
+              className="block text-zinc-800 font-semibold mb-1 dark:text-zinc-200"
             >
               Pressão arterial (mmHg):
             </label>
@@ -367,8 +367,8 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
               className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 ${
                 errors.sinaisVitais?.pressao
                   ? 'border-red-500 focus:ring-red-300'
-                  : 'border-gray-300 focus:ring-orange'
-              } text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                  : 'border-zinc-300 focus:ring-orange'
+              } text-black dark:bg-zinc-700 dark:border-zinc-600 dark:text-white`}
               value={
                 measurementState === 'measuring'
                   ? displayValues.pressao == null
@@ -395,7 +395,7 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
           <div>
             <label
               htmlFor="frequencia"
-              className="block text-gray-800 font-semibold mb-1 dark:text-gray-200"
+              className="block text-zinc-800 font-semibold mb-1 dark:text-zinc-200"
             >
               Frequência cardíaca (bpm):
             </label>
@@ -412,8 +412,8 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
               className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 ${
                 errors.sinaisVitais?.frequencia
                   ? 'border-red-500 focus:ring-red-300'
-                  : 'border-gray-300 focus:ring-orange'
-              } text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                  : 'border-zinc-300 focus:ring-orange'
+              } text-black dark:bg-zinc-700 dark:border-zinc-600 dark:text-white`}
               value={
                 measurementState === 'measuring'
                   ? displayValues.frequencia == null
@@ -440,7 +440,7 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
           <div>
             <label
               htmlFor="saturacao"
-              className="block text-gray-800 font-semibold mb-1 dark:text-gray-200"
+              className="block text-zinc-800 font-semibold mb-1 dark:text-zinc-200"
             >
               Saturação de oxigênio (SpO₂ %):
             </label>
@@ -457,8 +457,8 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
               className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 ${
                 errors.sinaisVitais?.saturacao
                   ? 'border-red-500 focus:ring-red-300'
-                  : 'border-gray-300 focus:ring-orange'
-              } text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                  : 'border-zinc-300 focus:ring-orange'
+              } text-black dark:bg-zinc-700 dark:border-zinc-600 dark:text-white`}
               value={
                 measurementState === 'measuring'
                   ? displayValues.saturacao == null
@@ -516,7 +516,7 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
               type="button"
               onClick={handleMeasureAgain}
               className="font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition
-                         bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                         bg-zinc-200 text-zinc-800 hover:bg-zinc-300 focus:ring-zinc-400 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600"
             >
               <span className="flex items-center justify-center">
                 <svg
@@ -543,7 +543,7 @@ export function T_04_VitalSigns({ onNext, defaultValues }) {
             disabled={isFormDisabled || showStartButton}
             className={`font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               isFormDisabled || showStartButton
-                ? 'bg-gray-400 text-gray-200 cursor-not-allowed dark:bg-gray-600 dark:text-gray-400'
+                ? 'bg-zinc-400 text-zinc-200 cursor-not-allowed dark:bg-zinc-600 dark:text-zinc-400'
                 : 'bg-orange text-white hover:bg-orange-600 focus:ring-orange-400'
             }`}
           >

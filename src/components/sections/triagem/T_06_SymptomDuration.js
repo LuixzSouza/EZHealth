@@ -21,7 +21,7 @@ export function T_06_SymptomDuration({ onNext, defaultValues }) {
   ];
 
   return (
-    <section className="pt-8 flex items-center justify-center w-full bg-gray-50 px-4">
+    <section className="pt-8 flex items-center justify-center w-full bg-zinc-50 dark:bg-themeDark px-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white/10 shadow-xl rounded-2xl p-8 flex flex-col gap-6 w-full max-w-md"
@@ -41,7 +41,7 @@ export function T_06_SymptomDuration({ onNext, defaultValues }) {
           {durationOptions.map((option) => (
             <label
               key={option.value}
-              className="flex items-center gap-3 p-3 border border-gray-300 rounded-md cursor-pointer transition-all
+              className="flex items-center gap-3 p-3 border border-zinc-300 rounded-md cursor-pointer transition-all
                         hover:border-orange text-black dark:text-white
                         peer-checked:border-orange peer-checked:bg-orange peer-checked:text-white"
             >
