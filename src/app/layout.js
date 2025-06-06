@@ -2,7 +2,8 @@
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Chatbot from "@/components/ChatBot/Chatbot";
-import VLibras from "@/components/Acessibilidade/VLibras";
+import VLibras2 from "@/components/Acessibilidade/VLibras";
+// import VLibras from 'vlibras-nextjs'
 // REMOVA: import Script from 'next/script'; // Não precisamos mais importar Script aqui diretamente para o Hand Talk
 
 // IMPORTAR O NOVO COMPONENTE CLIENTE
@@ -39,6 +40,7 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
+        
       </head>
       <body className={`${montserrat.variable} antialiased`}>
         {children}
@@ -46,7 +48,8 @@ export default function RootLayout({ children }) {
 
         {/* --- Renderiza o HandTalkScript Client Component --- */}
         {/* Ele mesmo conterá o <Script> e suas lógicas de onLoad/onError */}
-        <VLibras /> 
+        <VLibras2 /> 
+        
       </body>
     </html>
   );

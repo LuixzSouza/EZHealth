@@ -203,7 +203,7 @@ function AddAppointmentModal({ onClose, onSave, medicoNome }) {
     const minDate = today.toISOString().split('T')[0];
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[51]">
             <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl p-6 w-full max-w-md">
                 <h3 className="text-xl font-bold mb-4 text-black dark:text-white">Adicionar Nova Consulta</h3>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
