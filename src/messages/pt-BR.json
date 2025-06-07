@@ -1,4 +1,56 @@
 {
   "title": "Bem-vindo",
-  "dashboard.greeting": "Olá, {{name}}!"
+  "welcome": "Bem-vindo ao eZHealth",
+  "language": "Português",
+  "HomePage": {
+    "title": "AGILIDADE E EFICIÊNCIA NA TRIAGEM MÉDICA",
+    "subtitle": "Bem-vindo ao EZHealth, a triagem inteligente que agiliza o atendimento, reduz filas e otimiza o fluxo de pacientes em hospitais e consultórios.",
+    "Button": "Acessar Triagem"
+  },
+  "WhatIsSect": {
+    "title": "O que é EZHealth?",
+    "subtitle1": "O EZHealth é um software de triagem rápida e inteligente para hospitais e consultórios, agilizando o atendimento por meio de check-in digital, formulário de triagem e direcionamento automático ao especialista.",
+    "subtitle2": "Conta com uma opção de emergência para priorizar pacientes em estado crítico.",
+    "subtitle3": "Totalmente personalizável e integrado a sistemas hospitalares, melhora a gestão, reduz filas e otimiza recursos."
+  },
+  "BeneficiosSect": {
+    "title": "Benefícios EZHealth",
+    "ben1": "Redução do tempo de espera",
+    "ben2": "Encaminhamento inteligente",
+    "ben3": "Interface personalizada",
+    "ben4": "Compatibilidade com sistemas",
+    "ben5": "Organização do fluxo de pacientes",
+    "resp1": "Check-in digital e triagem automatizada agilizam o atendimento.",
+    "resp2": "Direcionamento ao especialista adequado, evitando consultas desnecessárias.",
+    "resp3": "Adaptação ao layout e identidade visual de cada cliente.",
+    "resp4": "Integração com prontuários eletrônicos e sistemas hospitalares.",
+    "resp5": "Otimização de recursos e redução de custos operacionais."
+  },
+  "HoswIsSect": {
+    "title": "Como funciona o EZHealth?",
+    "listTitle1": "Check-in digital",
+    "listSubTile1": "O paciente realiza o check-in diretamente pelo sistema, informando: Nome, CPF e Numeração do Convênio.",
+    "listTitle2": "Preenchimento do formulário",
+    "listSubTile2": "O paciente responde a um questionário inteligente sobre seus sintomas e histórico médico. O sistema utiliza algoritmos para analisar as informações e sugerir o melhor encaminhamento.",
+    "listTitle3": "Direcionamento automático para o especialista",
+    "listSubTile3": "Com base nas respostas, o EzHealth identifica a especialidade médica mais adequada e encaminha o paciente para o profissional correto, otimizando o fluxo de atendimento.",
+    "listTitle4": "Geração de senha e informação da sala",
+    "listSubTile4": "Após a triagem, o paciente recebe uma senha digital contendo: Número da senha para atendimento, Nome do especialista e Número da sala onde será atendido."
+  },
+  "VideoSect": {
+    "title": "Vídeo utilizando o software"
+  },
+  "TalkUsSect": {
+    "title": "FALE CONOSCO!",
+    "subTitle": "Tem dúvidas? Entre em contato e descubra como o EZHealth pode transformar seu atendimento!",
+    "titleInteresse": "Interessado em Nossas Soluções?",
+    "subTitleInteresse": "Preencha o formulário e nossa equipe entrará em contato com você o mais breve possível. Estamos prontos para tirar suas dúvidas e apresentar as vantagens do EZHealth para sua clínica!",
+    "button": "Iniciar Conversa",
+    "labelInputs": {
+      "name": "Nome:",
+      "gmail": "E-mail:",
+      "telefone": "Telefone:",
+      "msg": "Mensagem:"
+    }
+  }
 }

@@ -15,45 +15,28 @@ export default function VLibras() {
   const [showPlayer, setShowPlayer] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Modo de seleção de texto
   const [selectingText, setSelectingText] = useState(false);
-
-  // Array de objetos { char: originalChar, letter: normalizedLetterOrNull }
   const [charArray, setCharArray] = useState([]);
-
-  // Índice atual no playback dos caracteres
   const [playbackIndex, setPlaybackIndex] = useState(0);
-
-  // Path da imagem atual de Libras (ou null se char sem imagem)
   const [currentImage, setCurrentImage] = useState(null);
-
-  // Texto que vai aparecendo abaixo da imagem
   const [displayedText, setDisplayedText] = useState('');
-
-  // Controle de velocidade (multiplicador)
-  const [speed, setSpeed] = useState(1); // 0.5x, 1x, 1.5x, 2x, 3x
-
-  // Toggle legenda (mostrar texto abaixo da imagem)
+  const [speed, setSpeed] = useState(1);
   const [showSubtitle, setShowSubtitle] = useState(true);
-
-  // Toggling de tela de "Quem Somos"
   const [showInfoScreen, setShowInfoScreen] = useState(false);
-
-  // Toggling de tela de "Configuração" e "Buscar"
   const [showConfigScreen, setShowConfigScreen] = useState(false);
   const [showSearchScreen, setShowSearchScreen] = useState(false);
-
-  // Dados do prompt "Acessar link"
   const [linkToAccess, setLinkToAccess] = useState(null);
   const [linkCoords, setLinkCoords] = useState({ x: 0, y: 0 });
 
-  // Referência para o intervalo de playback
   const intervalRef = useRef(null);
+  const speakingUtteranceRef = useRef(null);
 
-  // Base de delay em ms (1x = 1000ms)
+  const [wordArray, setWordArray] = useState([]);
+  const [audioWordIndex, setAudioWordIndex] = useState(0);
+
   const BASE_DELAY = 1000;
+  const [showAudio, setShowAudio] = useState(false);
 
-  // Normaliza c/ remoção de diacríticos e transforma em letra válida (a-z) ou null
   const normalizeChar = (ch) => {
     const normalized = ch
       .normalize('NFD')
@@ -62,23 +45,62 @@ export default function VLibras() {
     return normalized >= 'a' && normalized <= 'z' ? normalized : null;
   };
 
-  // Inicia o player ao clicar no ícone
+  const cancelSpeech = useCallback(() => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      speakingUtteranceRef.current = null;
+    }
+  }, []);
+
+  const speakText = useCallback((text) => {
+    if (!showAudio || !text || text.trim() === '') {
+      return;
+    }
+
+    if (!('speechSynthesis' in window)) {
+      console.warn("API de Síntese de Fala não suportada neste navegador.");
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR';
+    utterance.rate = speed;
+
+    utterance.onstart = () => {
+      speakingUtteranceRef.current = utterance;
+    };
+    utterance.onend = () => {
+      if (speakingUtteranceRef.current === utterance) {
+        speakingUtteranceRef.current = null;
+      }
+    };
+    utterance.onerror = (event) => {
+      if (event.error !== 'interrupted') {
+        console.error('Erro na fala:', event.error, 'Tipo de erro:', event.error, 'Texto:', text);
+      }
+      if (speakingUtteranceRef.current === utterance) {
+        speakingUtteranceRef.current = null;
+      }
+    };
+
+    window.speechSynthesis.speak(utterance);
+
+  }, [showAudio, speed]);
+
   const handleClickIcon = () => {
     setShowTooltip(false);
     setLoading(true);
     setShowPlayer(true);
-    // fecha todas as telas internas
     setShowInfoScreen(false);
     setShowConfigScreen(false);
     setShowSearchScreen(false);
     setLinkToAccess(null);
-
+    cancelSpeech();
     setTimeout(() => {
       setLoading(false);
     }, 2000);
   };
 
-  // Fecha o player e reseta estados
   const handleClosePlayer = () => {
     setShowPlayer(false);
     setSelectingText(false);
@@ -86,6 +108,8 @@ export default function VLibras() {
     setPlaybackIndex(0);
     setCurrentImage(null);
     setDisplayedText('');
+    setWordArray([]);
+    setAudioWordIndex(0);
     clearInterval(intervalRef.current);
     intervalRef.current = null;
     setSpeed(1);
@@ -94,24 +118,26 @@ export default function VLibras() {
     setShowSearchScreen(false);
     setShowSubtitle(true);
     setLinkToAccess(null);
+    cancelSpeech();
   };
 
-  // Inicia modo de seleção de texto
   const handleStartSelecting = () => {
     setSelectingText(true);
     setCharArray([]);
     setPlaybackIndex(0);
     setCurrentImage(null);
     setDisplayedText('');
+    setWordArray([]);
+    setAudioWordIndex(0);
     clearInterval(intervalRef.current);
     intervalRef.current = null;
     setShowInfoScreen(false);
     setShowConfigScreen(false);
     setShowSearchScreen(false);
     setLinkToAccess(null);
+    cancelSpeech();
   };
 
-  // Converte texto em array de objetos { char, letter }
   const textToCharArray = (text) => {
     return Array.from(text).map((ch) => ({
       char: ch,
@@ -119,22 +145,40 @@ export default function VLibras() {
     }));
   };
 
-  // Listener global de clique para capturar texto clicado OU link
+  const splitTextIntoWords = (text) => {
+    const regex = /[\p{L}\p{N}']+|\s+|[.,!?;:]/gu;
+    const matches = text.match(regex);
+
+    if (!matches) {
+      return [];
+    }
+
+    return matches.filter(part => part.trim() !== '');
+  };
+
   const clickListener = useCallback(
     (e) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // Se clicou em <a href>, exibe prompt para acessar link
       const anchor = e.target.closest('a');
       if (anchor && anchor.href) {
+        // Obtenha o texto do link
+        const linkText = anchor.innerText || anchor.textContent || '';
+        const promptText = `Link ativado: ${linkText}. Deseja acessar?`;
+
+        // Cancela qualquer fala atual e fala o texto do link + a pergunta
+        cancelSpeech();
+        if (showAudio) {
+            speakText(promptText);
+        }
+
         setLinkToAccess(anchor.href);
         setLinkCoords({ x: e.clientX, y: e.clientY });
         setSelectingText(false);
         return;
       }
 
-      // Se alguma tela interna estiver aberta, ignora seleção de texto
       if (showInfoScreen || showConfigScreen || showSearchScreen) {
         return;
       }
@@ -142,14 +186,17 @@ export default function VLibras() {
       const el = e.target;
       const rawText = el.innerText || el.textContent || '';
       const trimmed = rawText.trim();
-      if (!trimmed) return;
+      if (!trimmed) {
+        return;
+      }
 
-      // Cancela playback anterior para começar novo
       clearInterval(intervalRef.current);
       intervalRef.current = null;
 
       const arr = textToCharArray(trimmed);
-      if (arr.every((o) => o.letter === null)) return; // se nenhuma letra válida, ignora
+      if (arr.every((o) => o.letter === null)) {
+        return;
+      }
 
       setCharArray(arr);
       setSelectingText(false);
@@ -160,14 +207,18 @@ export default function VLibras() {
       setShowConfigScreen(false);
       setShowSearchScreen(false);
       setLinkToAccess(null);
+
+      const words = splitTextIntoWords(trimmed);
+      setWordArray(words);
+      setAudioWordIndex(0);
+      cancelSpeech();
     },
-    [showInfoScreen, showConfigScreen, showSearchScreen]
+    [showInfoScreen, showConfigScreen, showSearchScreen, cancelSpeech, showAudio, speakText] // Adicionado `showAudio` e `speakText` às dependências
   );
 
-  // Adiciona ou remove listener e ajusta cursor conforme selectingText
   useEffect(() => {
     if (selectingText) {
-      document.body.style.cursor = `url("/icons/libras.svg"), auto`;
+      document.body.style.cursor = `crosshair`;
       document.addEventListener('click', clickListener, true);
     } else {
       document.body.style.cursor = '';
@@ -179,38 +230,53 @@ export default function VLibras() {
     };
   }, [selectingText, clickListener]);
 
-  // Configura ou reconfigura o intervalo de playback, começando de playbackIndex atual
   const setupInterval = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
     if (charArray.length === 0 || playbackIndex >= charArray.length) {
+      if (window.speechSynthesis && !window.speechSynthesis.speaking) {
+         cancelSpeech();
+      }
       return;
     }
 
-    let idx = playbackIndex;
+    let currentIdx = playbackIndex;
     const delay = BASE_DELAY / speed;
 
     intervalRef.current = setInterval(() => {
-      if (idx < charArray.length) {
-        const { char, letter } = charArray[idx];
+      if (currentIdx < charArray.length) {
+        const { char, letter } = charArray[currentIdx];
         if (letter) {
           setCurrentImage(`/images/acessibilidade/alfabeto_${letter}.png`);
         } else {
           setCurrentImage(null);
         }
-        setDisplayedText((prev) => prev + char);
-        idx++;
-        setPlaybackIndex(idx);
+        setDisplayedText((prev) => {
+          const newText = prev + char;
+
+          if (showAudio && wordArray.length > 0 && audioWordIndex < wordArray.length) {
+              const currentWord = wordArray[audioWordIndex];
+              if (newText.toLowerCase().includes(currentWord.toLowerCase()) || (currentIdx === charArray.length -1 && audioWordIndex === wordArray.length -1)) {
+                  if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+                      speakText(currentWord);
+                      setAudioWordIndex(prevIndex => prevIndex + 1);
+                  }
+              }
+          }
+          return newText;
+        });
+        currentIdx++;
+        setPlaybackIndex(currentIdx);
       } else {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
+        cancelSpeech();
       }
     }, delay);
-  }, [charArray, playbackIndex, speed]);
+  }, [charArray, playbackIndex, speed, cancelSpeech, showAudio, wordArray, audioWordIndex, speakText]);
 
-  // Efetua setup de intervalo sempre que charArray, speed ou playbackIndex mudam
   useEffect(() => {
     setupInterval();
     return () => {
@@ -219,25 +285,37 @@ export default function VLibras() {
     };
   }, [charArray, speed, playbackIndex, setupInterval]);
 
-  // Calcula progresso em porcentagem
   const progressPercent =
     charArray.length > 0
       ? Math.min((playbackIndex / charArray.length) * 100, 100)
       : 0;
 
-  // Reinicia a automação (mesmo texto novamente)
   const handleRestart = () => {
-    if (charArray.length === 0) return;
+    if (charArray.length === 0) {
+      return;
+    }
+    cancelSpeech(); 
+    
     clearInterval(intervalRef.current);
     intervalRef.current = null;
     setPlaybackIndex(0);
     setDisplayedText('');
     setCurrentImage(null);
+    setAudioWordIndex(0);
+
+    if (wordArray.length > 0) {
+      setTimeout(() => {
+        speakText(wordArray.join(' '));
+      }, 50);
+    }
   };
 
-  // "Pular" automação: mostra tudo de uma vez e limpa interval
   const handleSkip = () => {
-    if (charArray.length === 0) return;
+    if (charArray.length === 0) {
+      return;
+    }
+    cancelSpeech();
+
     clearInterval(intervalRef.current);
     intervalRef.current = null;
     const lastItem = charArray[charArray.length - 1];
@@ -246,61 +324,67 @@ export default function VLibras() {
     } else {
       setCurrentImage(null);
     }
-    setDisplayedText(charArray.map((o) => o.char).join(''));
+    const fullText = charArray.map((o) => o.char).join('');
+    setDisplayedText(fullText);
     setPlaybackIndex(charArray.length);
+    setAudioWordIndex(wordArray.length);
+
+    if (fullText) {
+        setTimeout(() => {
+            speakText(fullText);
+        }, 50);
+    }
   };
 
-  // Alterna tela de "Quem Somos"
   const handleToggleInfo = () => {
     const willShowInfo = !showInfoScreen;
     setShowInfoScreen(willShowInfo);
     if (willShowInfo) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+      cancelSpeech();
     } else {
       setupInterval();
     }
   };
 
-  // Alterna tela de Configuração
   const handleToggleConfig = () => {
     const willShow = !showConfigScreen;
     setShowConfigScreen(willShow);
-    // fecha outras telas
     setShowInfoScreen(false);
     setShowSearchScreen(false);
     if (willShow) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+      cancelSpeech();
     } else {
       setupInterval();
     }
   };
 
-  // Alterna tela de Buscar
   const handleToggleSearch = () => {
     const willShow = !showSearchScreen;
     setShowSearchScreen(willShow);
-    // fecha outras telas
     setShowInfoScreen(false);
     setShowConfigScreen(false);
     if (willShow) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+      cancelSpeech();
     } else {
       setupInterval();
     }
   };
 
-  // Indica se está tocando (playback em andamento)
   const isPlaying =
     charArray.length > 0 && playbackIndex < charArray.length && !showInfoScreen && !showConfigScreen && !showSearchScreen;
 
-  // Cadastrar ou cancelar o acesso ao link
   const handleAccessLink = () => {
     if (linkToAccess) window.location.href = linkToAccess;
   };
-  const handleCancelLink = () => setLinkToAccess(null);
+  const handleCancelLink = () => {
+    setLinkToAccess(null);
+  }
 
   return (
     <>
@@ -415,6 +499,19 @@ export default function VLibras() {
                 />
                 <label htmlFor="toggleSubtitle" className="text-sm">
                   Mostrar Legenda
+                </label>
+              </div>
+              {/* NOVO TOGGLE PARA OUVIR ÁUDIO */}
+              <div className="flex items-center mb-4 text-black dark:text-white">
+                <input
+                  type="checkbox"
+                  id="toggleAudio"
+                  checked={showAudio}
+                  onChange={() => setShowAudio((prev) => !prev)}
+                  className="mr-2"
+                />
+                <label htmlFor="toggleAudio" className="text-sm">
+                  Ouvir Áudio
                 </label>
               </div>
               <div className="mb-4">
