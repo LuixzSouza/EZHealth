@@ -13,10 +13,10 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 // Importar os componentes das abas administrativas
 import { DashboardAdminTab } from "@/components/sections/painelAdmin/DashboardAdminTab";
 import { MedicosAdminTab } from "@/components/sections/painelAdmin/MedicosAdminTab";
-import { UsuariosAdminTab } from "@/components/sections/painelAdmin/UsuariosAdminTab";
 import { SalasAdminTab } from "@/components/sections/painelAdmin/SalasAdminTab"; // Importar a nova aba
 import { ConfiguracoesAdminTab } from "@/components/sections/painelAdmin/ConfiguracoesAdminTab";
 import { SidebarLink } from "@/components/sections/painelAdmin/SidebarLink";
+import { PacientesAdminTab } from "@/components/sections/painelAdmin/PacientesAdminTab";
 
 
 export default function PainelAdmin() {
@@ -76,7 +76,7 @@ export default function PainelAdmin() {
       case 'medicos':
         return <MedicosAdminTab />;
       case 'usuarios':
-        return <UsuariosAdminTab />;
+        return <PacientesAdminTab />;
       case 'salas': // Novo case para a aba de salas
         return <SalasAdminTab />;
       case 'configuracoes':
@@ -117,7 +117,7 @@ export default function PainelAdmin() {
         <div className="flex min-h-screen">
           <aside className={`
             bg-white dark:bg-themeDark p-6 space-y-6 shadow-md
-            fixed inset-y-0 left-0 z-[51]
+            fixed inset-y-0 left-0 z-40
             w-64
             transform transition-transform duration-300 ease-in-out
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}

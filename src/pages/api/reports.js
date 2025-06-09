@@ -1,25 +1,7 @@
-import { MongoClient } from 'mongodb';
+// pages/api/reports.js (VERSÃO REATORADA COM MONGOOSE)
 
-// Configurações da conexão com o MongoDB
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB_NAME || 'ezhealth_db';
-
-let clientPromise;
-
-if (!uri) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
-
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromiseReports) {
-    const client = new MongoClient(uri);
-    global._mongoClientPromiseReports = client.connect();
-  }
-  clientPromise = global._mongoClientPromiseReports;
-} else {
-  const client = new MongoClient(uri);
-  clientPromise = client.connect();
-}
+import connectDB from '@/lib/mongodb';
+import Triage from '@/model/Triage'; // Usamos o modelo Triage como base para os relatórios
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -28,30 +10,31 @@ export default async function handler(req, res) {
   }
 
   try {
-    const clientConn = await clientPromise;   // << corrigido aqui
-    const db = clientConn.db(dbName);
-    const collection = db.collection('triagens');
+    await connectDB();
 
-    // Pega até 50 triagens mais recentes para listar como relatórios
-    const triagens = await collection
-      .find({})
+    // ANTES: db.collection('triagens').find({})
+    // DEPOIS: Usamos Triage.find() e populamos o nome do paciente.
+    const triages = await Triage.find({})
+      .populate('patientId', 'nome') // A MÁGICA ACONTECE AQUI: busca o nome do paciente relacionado
       .sort({ createdAt: -1 })
-      .limit(50)
-      .toArray();
+      .limit(50);
 
-    const reports = triagens.map((triagem) => ({
+    // ANTES: Mapeamento acessando 'triagem.dadosPessoalPaciente.nome'
+    // DEPOIS: Acessamos 'triagem.patientId.nome', que é mais limpo e garantido pelo populate.
+    const reports = triages.map((triagem) => ({
       id: triagem._id.toString(),
       type: 'Relatório de Triagem',
-      patient: triagem.dadosPessoalPaciente?.nome || 'Paciente Desconhecido',
+      patient: triagem.patientId?.nome || 'Paciente Desconhecido', // Acesso direto ao nome do paciente
       date: triagem.createdAt
         ? new Date(triagem.createdAt).toISOString().split('T')[0]
         : 'N/A',
-      file: `/api/generate-report?id=${triagem._id.toString()}`,
+      file: `/api/generate-report?id=${triagem._id.toString()}`, // O link para o gerador de PDF continua igual
     }));
 
-    res.status(200).json(reports);
+    res.status(200).json({ success: true, data: reports });
+    
   } catch (error) {
     console.error('Erro em /api/reports:', error);
-    res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    res.status(500).json({ success: false, message: 'Erro interno do servidor', error: error.message });
   }
 }

@@ -1,26 +1,7 @@
-// pages/api/urgencias-triagem.js
+// pages/api/urgencias-triagem.js (VERSÃO REATORADA COM MONGOOSE)
 
-import { MongoClient } from 'mongodb';
-
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB_NAME || 'ezhealth_db';
-
-let clientPromise;
-
-if (!uri) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
-
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromiseUrgencias) {
-    const client = new MongoClient(uri);
-    global._mongoClientPromiseUrgencias = client.connect();
-  }
-  clientPromise = global._mongoClientPromiseUrgencias;
-} else {
-  const client = new MongoClient(uri);
-  clientPromise = client.connect();
-}
+import connectDB from '@/lib/mongodb';
+import Triage from '@/model/Triage';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -29,48 +10,52 @@ export default async function handler(req, res) {
   }
 
   try {
-    const client = await clientPromise;
-    const db = client.db(dbName);
-    const triagensColl = db.collection('triagens');
+    await connectDB();
 
-    // Mapeamento das cores e valores ilustrativos padrão (se não houver dados)
-    const defaultUrgencias = {
-      'Vermelho': { tipo: 'Vermelho', valor: 0 }, // Ou 15 para ilustração
-      'Laranja': { tipo: 'Laranja', valor: 0 },   // Ou 30 para ilustração
-      'Amarelo': { tipo: 'Amarelo', valor: 0 },   // Ou 45 para ilustração
-      'Verde': { tipo: 'Verde', valor: 0 },     // Ou 60 para ilustração
-      'Azul': { tipo: 'Azul', valor: 0 },       // Ou 20 para ilustração
-    };
-
-    // Agrega os dados existentes no banco
+    // ANTES: Agregação por `classificacaoRisco.color`, que é um valor rgba(...)
+    // DEPOIS: Agregamos por `classificacao.label`, que é o nome da classificação. É mais robusto.
     const pipeline = [
       {
         $group: {
-          _id: "$classificacaoRisco.color",
-          valor: { $sum: 1 }
+          _id: "$classificacao.label", // Ex: "Emergência", "Urgente", etc.
+          count: { $sum: 1 }
         }
       }
     ];
-    const result = await triagensColl.aggregate(pipeline).toArray();
 
-    // Atualiza os valores padrão com os dados reais do banco de dados
-    result.forEach(item => {
-      if (defaultUrgencias[item._id]) {
-        defaultUrgencias[item._id].valor = item.valor;
+    const aggregationResult = await Triage.aggregate(pipeline);
+
+    // Mapeamento dos labels (do banco) para as cores (para o gráfico/UI)
+    const labelToColorMap = {
+      'Emergência': 'Vermelho',
+      'Muito Urgente': 'Laranja',
+      'Urgente': 'Amarelo',
+      'Pouco Urgente': 'Verde',
+      'Não Urgente': 'Azul',
+    };
+
+    // Estrutura padrão para garantir que todas as cores apareçam no resultado
+    const urgenciasCount = {
+      'Vermelho': { tipo: 'Vermelho', valor: 0 },
+      'Laranja': { tipo: 'Laranja', valor: 0 },
+      'Amarelo': { tipo: 'Amarelo', valor: 0 },
+      'Verde': { tipo: 'Verde', valor: 0 },
+      'Azul': { tipo: 'Azul', valor: 0 },
+    };
+
+    // Preenche a contagem com os dados reais do banco
+    aggregationResult.forEach(item => {
+      const label = item._id; // O label, ex: "Emergência"
+      const colorName = labelToColorMap[label]; // Converte o label para a cor, ex: "Vermelho"
+      if (colorName) {
+        urgenciasCount[colorName].valor = item.count;
       }
     });
 
-    // Converte o objeto de volta para um array na ordem desejada
-    const finalData = [
-      defaultUrgencias['Vermelho'],
-      defaultUrgencias['Laranja'],
-      defaultUrgencias['Amarelo'],
-      defaultUrgencias['Verde'],
-      defaultUrgencias['Azul'],
-    ].filter(item => item.valor > 0 || (process.env.NODE_ENV === 'development' && item.valor === 0)); // Filtra apenas se tiver valor, ou mantém todos em dev para ilustração
-
-    // Se quiser manter os valores ilustrativos quando a contagem for 0, altere as linhas acima
-    // Ou, para valores sempre ilustrativos em dev:
+    // Converte o objeto para o formato de array esperado pelo frontend
+    let finalData = Object.values(urgenciasCount);
+    
+    // Mantém a sua lógica para exibir dados ilustrativos em ambiente de desenvolvimento
     if (process.env.NODE_ENV === 'development' && finalData.every(item => item.valor === 0)) {
         finalData[0].valor = 15; // Vermelho
         finalData[1].valor = 30; // Laranja
@@ -79,10 +64,10 @@ export default async function handler(req, res) {
         finalData[4].valor = 20; // Azul
     }
 
+    res.status(200).json({ success: true, data: finalData });
 
-    return res.status(200).json(finalData);
   } catch (error) {
     console.error('Erro em /api/urgencias-triagem:', error);
-    return res.status(500).json({ message: 'Erro interno no servidor', error: error.message });
+    res.status(500).json({ success: false, message: 'Erro interno do servidor', error: error.message });
   }
 }

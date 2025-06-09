@@ -1,64 +1,104 @@
-// pages/api/agenda.js
-import { MongoClient } from 'mongodb';
+// pages/api/agenda.js (VERSÃO REATORADA COM MONGOOSE)
 
-// --- Configuração da Conexão com o Banco de Dados ---
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB_NAME || 'ezhealth_db';
+import connectDB from '@/lib/mongodb';
+import Appointment from '@/model/Appointment';
+import Doctor from '@/model/Doctor'; // Necessário para a lógica de filtro
+import Patient from '@/model/Patient'; // Necessário para popular os dados
 
-let client;
-let clientPromise;
-
-if (!uri) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
-
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromiseAgenda) {
-    client = new MongoClient(uri);
-    global._mongoClientPromiseAgenda = client.connect();
-  }
-  clientPromise = global._mongoClientPromiseAgenda;
-} else {
-  client = new MongoClient(uri);
-  clientPromise = client.connect();
-}
-
-// --- Manipulador da API ---
 export default async function handler(req, res) {
-  try {
-    const client = await clientPromise;
-    const db = client.db(dbName);
-    const collection = db.collection('appointments'); // Coleção de consultas
+  await connectDB();
 
-    if (req.method === 'GET') {
-      const { medicoNome } = req.query; // <-- NOVIDADE AQUI: Pega o nome do médico da query string
+  switch (req.method) {
+    case 'GET':
+      try {
+        const { doctorId, patientId, month, year } = req.query;
 
-      let query = {};
-      if (medicoNome) {
-        // Se medicoNome for fornecido, filtre as consultas por esse médico.
-        // ASSUMIR: que seus documentos de consulta têm um campo 'medico.nome'
-        // ou 'doctorName' ou similar.
-        query['medico.nome'] = medicoNome; // Filtra por 'medico.nome'
-        // Ou se fosse um campo direto: query.doctorName = medicoNome;
+        // Monta o objeto de query dinamicamente
+        const query = {};
+        if (doctorId) {
+          query.doctorId = doctorId; // Filtra pela referência do médico (ObjectId)
+        }
+        if (patientId) {
+            query.patientId = patientId; // Filtra pela referência do paciente (ObjectId)
+        }
+        // Filtro por mês e ano
+        if (month && year) {
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0, 23, 59, 59); // Último dia do mês
+            query.date = { $gte: startDate, $lte: endDate };
+        }
+        
+        // ANTES: collection.find({ 'medico.nome': medicoNome }).sort({ date: 1, time: 1 })
+        // DEPOIS: Usamos a query por ID e populamos com dados relevantes.
+        const appointments = await Appointment.find(query)
+          .populate('doctorId', 'nome especialidade foto') // Traz nome, especialidade e foto do Doutor
+          .populate('patientId', 'nome cpf') // Traz nome e CPF do Paciente
+          .sort({ date: 1 }); // Ordena pela data/hora do agendamento
+
+        res.status(200).json({ success: true, data: appointments });
+      } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
       }
-      
-      const appointments = await collection.find(query).sort({ date: 1, time: 1 }).toArray();
-      res.status(200).json(appointments);
+      break;
 
-    } else if (req.method === 'POST') {
-      const newAppointment = req.body;
-      newAppointment.createdAt = new Date(); 
+    case 'POST':
+      try {
+        // ANTES: Inserção manual com collection.insertOne(newAppointment)
+        // DEPOIS: Mongoose valida os dados do req.body contra o Schema antes de criar.
+        const appointment = await Appointment.create(req.body);
+        res.status(201).json({ success: true, data: appointment });
+      } catch (error) {
+        // Retorna um erro claro se campos obrigatórios (doctorId, patientId, date) faltarem.
+        res.status(400).json({ success: false, message: error.message });
+      }
+      break;
+    
+    case 'PUT':
+        try {
+            const { id } = req.query;
+            const updateData = req.body;
 
-      const result = await collection.insertOne(newAppointment);
-      res.status(201).json({ message: 'Consulta adicionada com sucesso!', id: result.insertedId });
-    }
-    // Adicione outros métodos (PUT, DELETE) conforme necessário
-    else {
-      res.setHeader('Allow', ['GET', 'POST']);
+            if (!id) {
+                return res.status(400).json({ success: false, message: 'O ID do agendamento é obrigatório.' });
+            }
+
+            const updatedAppointment = await Appointment.findByIdAndUpdate(id, updateData, {
+                new: true, // Retorna o documento já atualizado
+                runValidators: true, // Garante que os dados da atualização são válidos
+            });
+
+            if (!updatedAppointment) {
+                return res.status(404).json({ success: false, message: 'Agendamento não encontrado.' });
+            }
+
+            res.status(200).json({ success: true, data: updatedAppointment });
+        } catch(error) {
+            res.status(400).json({ success: false, message: error.message });
+        }
+        break;
+
+    case 'DELETE':
+        try {
+            const { id } = req.query;
+            if (!id) {
+                return res.status(400).json({ success: false, message: 'O ID do agendamento é obrigatório.' });
+            }
+
+            const deletedAppointment = await Appointment.findByIdAndDelete(id);
+
+            if (!deletedAppointment) {
+                return res.status(404).json({ success: false, message: 'Agendamento não encontrado.' });
+            }
+
+            res.status(200).json({ success: true, message: 'Agendamento removido com sucesso.' });
+        } catch(error) {
+            res.status(400).json({ success: false, message: error.message });
+        }
+        break;
+
+    default:
+      res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
       res.status(405).end(`Method ${req.method} Not Allowed`);
-    }
-  } catch (error) {
-    console.error('Erro em /api/agenda:', error);
-    res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+      break;
   }
 }

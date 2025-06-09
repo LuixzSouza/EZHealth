@@ -21,7 +21,7 @@ export function Header() {
 
     return(
         <>
-            <header className="w-full dark:bg-themeDark bg-white shadow-2xl shadow-black/10 dark:shadow-white/5 sticky top-0 z-50" >
+            <header className="w-full dark:bg-themeDark bg-white shadow-2xl shadow-black/10 dark:shadow-white/5 sticky top-0 z-30" >
                 <ContainerGrid className="flex items-center justify-between" >
                     <div className="flex items-start justify-start" >
                         <Link href={"/#"} className="relative group" >

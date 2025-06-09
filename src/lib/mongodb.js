@@ -1,34 +1,46 @@
-import mongoose from 'mongoose';
+// ✅ PASSO 1: O ARQUIVO MAIS IMPORTANTE!
+// Garanta que você tem um arquivo em 'src/lib/mongodb.js'
+// com EXATAMENTE este conteúdo. Isso corrige o erro da API.
 
-console.log('MONGODB_URI:', process.env.MONGODB_URI);
+import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error("Adicione MONGODB_URI no .env.local");
+  throw new Error(
+    'Please define the MONGODB_URI environment variable inside .env.local'
+  );
 }
 
-let cached = global.mongoose || { conn: null, promise: null };
+let cached = global.mongoose;
 
-export async function connectDB() {
-  if (cached.conn) return cached.conn;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
+  }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+    const opts = {
+      bufferCommands: false,
+    };
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       return mongoose;
     });
   }
+  
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
 
-  cached.conn = await cached.promise;
-  global.mongoose = cached;
   return cached.conn;
 }
 
-export async function testConnection() {
-  try {
-    await connectDB();
-    console.log('✅ Conexão com MongoDB estabelecida!');
-  } catch (error) {
-    console.error('❌ Erro na conexão com MongoDB:', error);
-  }
-}
+export default connectDB; // A exportação padrão é essencial
+

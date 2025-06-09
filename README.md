@@ -39,6 +39,8 @@ filas e otimiza recursos.
 - uuid (Gera IDs de sessão)
 - Web Speech API (Tranforma audio em texto)
 - heroicons/react (Icones)
+- react-imask (Validar CPF)
+- bcrypt (Criptografia)
 - .env.local (Segurança)
 
 ## Rodar o projeto:

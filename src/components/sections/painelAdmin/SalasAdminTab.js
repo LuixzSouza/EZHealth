@@ -1,225 +1,202 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react'; // Adicionado useCallback
+import { useState, useEffect, useCallback, useMemo } from 'react'; // ✅ NOVO: import useMemo
+import { useForm } from 'react-hook-form';
 import { Heading } from "@/components/typography/Heading";
 import { ParagraphBlue } from "@/components/theme/ParagraphBlue";
 import { ButtonPrimary } from "@/components/theme/ButtonPrimary";
-import { PlusCircleIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PlusCircleIcon, PencilSquareIcon, TrashIcon, UserIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
-const SALAS_POLLING_INTERVAL = 30000; // Intervalo de polling para salas (30 segundos)
+// ... (O restante dos componentes ConfirmationModal, AlertDialog e RoomFormModal permanecem exatamente os mesmos)
 
-// --- Sub-componente: Modal de Confirmação ---
-// (Seu código para ConfirmationModal permanece o mesmo)
 function ConfirmationModal({ isOpen, onClose, onConfirm, title, message }) {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 bg-slate-600 bg-opacity-50 flex items-center justify-center z-[53] p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
-        <Heading as="h3" text={title} colorClass="dark:text-orangeDark text-orange" className="mb-4 text-xl sm:text-2xl text-center" />
-        <ParagraphBlue className="mb-6 text-center text-slate-700 dark:text-slate-300">{message}</ParagraphBlue>
-        <div className="flex justify-end gap-3">
-          <button type="button" onClick={onClose} className="px-4 py-2 bg-slate-200 text-slate-800 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">Cancelar</button>
-          <ButtonPrimary onClick={onConfirm}>Confirmar</ButtonPrimary>
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
+                <h3 className="text-xl font-bold mb-4 text-orange-500">{title}</h3>
+                <p className="mb-6 text-slate-700 dark:text-slate-300">{message}</p>
+                <div className="flex justify-center gap-3">
+                    <button type="button" onClick={onClose} className="px-4 py-2 bg-slate-200 text-slate-800 rounded-md hover:bg-slate-300">Cancelar</button>
+                    <ButtonPrimary onClick={onConfirm}>Confirmar</ButtonPrimary>
+                </div>
+            </div>
         </div>
+    );
+}
+
+function AlertDialog({ isOpen, onClose, title, message }) {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
+                <h3 className="text-xl font-bold mb-4 text-orange-500">{title}</h3>
+                <p className="mb-6 text-slate-700 dark:text-slate-300">{message}</p>
+                <div className="flex justify-center">
+                    <ButtonPrimary onClick={onClose}>Entendido</ButtonPrimary>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function RoomFormModal({ isOpen, onClose, onSave, roomToEdit, doctors }) {
+  const { register, handleSubmit, reset } = useForm();
+  
+  useEffect(() => {
+    if (isOpen) {
+      reset({
+        name: roomToEdit?.name || '',
+        type: roomToEdit?.type || 'Geral',
+        doctorId: roomToEdit?.doctorId?._id || '',
+        // O campo patientId não é mais editável aqui
+      });
+    }
+  }, [isOpen, roomToEdit, reset]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-md">
+        <h3 className="text-xl font-bold mb-4 text-orange-500 text-center">{roomToEdit ? "Editar Sala" : "Adicionar Nova Sala"}</h3>
+        <form onSubmit={handleSubmit(onSave)} className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium">Nome da Sala</label>
+            <input id="name" type="text" {...register("name", { required: true })} className="mt-1 block w-full input-style" />
+          </div>
+          <div>
+            <label htmlFor="type" className="block text-sm font-medium">Tipo da Sala</label>
+            <select id="type" {...register("type")} className="mt-1 block w-full input-style">
+              <option value="Geral">Geral</option>
+              <option value="Consultório">Consultório</option>
+              <option value="Emergência">Emergência</option>
+              <option value="Triagem">Triagem</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="doctorId" className="block text-sm font-medium">Médico Principal (Opcional)</label>
+            <select id="doctorId" {...register("doctorId")} className="mt-1 block w-full input-style">
+              <option value="">Nenhum Médico</option>
+              {/* A lista de 'doctors' aqui já virá filtrada do componente pai */}
+              {doctors?.map(doc => <option key={doc._id} value={doc._id}>{doc.nome}</option>)}
+            </select>
+          </div>
+          <div className="flex justify-end gap-3 pt-4">
+            <button type="button" onClick={onClose} className="px-4 py-2 bg-slate-200 rounded-md">Cancelar</button>
+            <ButtonPrimary type="submit">{roomToEdit ? "Salvar Alterações" : "Adicionar Sala"}</ButtonPrimary>
+          </div>
+        </form>
       </div>
     </div>
   );
 }
 
-// --- Sub-componente: Modal de Alerta/Mensagem ---
-// (Seu código para AlertDialog permanece o mesmo)
-function AlertDialog({ isOpen, onClose, title, message }) {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 bg-slate-600 bg-opacity-50 flex items-center justify-center z-[54] p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
-        <Heading as="h3" text={title} colorClass="dark:text-orangeDark text-orange" className="mb-4 text-xl sm:text-2xl text-center" />
-        <ParagraphBlue className="mb-6 text-center text-slate-700 dark:text-slate-300">{message}</ParagraphBlue>
-        <div className="flex justify-center">
-          <ButtonPrimary onClick={onClose}>Entendido</ButtonPrimary>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function SalasAdminTab() {
   const [salas, setSalas] = useState([]);
-  const [loadingSalas, setLoadingSalas] = useState(true); // Renomeado para clareza
-  const [errorSalas, setErrorSalas] = useState(null);    // Renomeado para clareza
-  const [isPollingSalas, setIsPollingSalas] = useState(false); // Para feedback de polling
-
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRoom, setCurrentRoom] = useState(null);
-
-  const [doctors, setDoctors] = useState([]);
-  const [patients, setPatients] = useState([]); // Esta lista de pacientes é de /api/patients
-
+  
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(() => () => {});
-  const [confirmMessage, setConfirmMessage] = useState('');
   const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmMessage, setConfirmMessage] = useState('');
 
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
 
-  const fetchSalas = useCallback(async (isPoll = false) => {
-    if (!isPoll) {
-      setLoadingSalas(true);
-    } else {
-      setIsPollingSalas(true);
-    }
-    setErrorSalas(null);
+  const fetchData = useCallback(async () => {
     try {
-      const resp = await fetch("https://ezhealthluixz.netlify.app/api/salas"); // Caminho relativo
-      if (!resp.ok) {
-        throw new Error(`Erro ao buscar salas! Status: ${resp.status}`);
-      }
-      const data = await resp.json();
-      setSalas(data);
+      setLoading(true);
+      const [salasRes, doctorsRes] = await Promise.all([
+        fetch('/api/salas'),
+        fetch('/api/medicos?status=Ativo'),
+      ]);
+      
+      const salasResult = await salasRes.json();
+      const doctorsResult = await doctorsRes.json();
+
+      if (!salasResult.success) throw new Error(salasResult.message);
+      if (!doctorsResult.success) throw new Error(doctorsResult.message);
+      
+      setSalas(salasResult.data);
+      setDoctors(doctorsResult.data);
     } catch (err) {
-      console.error("Erro ao buscar salas:", err);
-      setErrorSalas("Não foi possível carregar as salas."); // Mensagem mais concisa
+      setError("Não foi possível carregar os dados.");
     } finally {
-      if (!isPoll) {
-        setLoadingSalas(false);
-      } else {
-        setIsPollingSalas(false);
-      }
-    }
-  }, []); // useCallback para estabilizar a função
-
-  const fetchDoctors = useCallback(async () => { // Envolvido em useCallback
-    try {
-      const resp = await fetch("https://ezhealthluixz.netlify.app/api/medicos"); // Caminho relativo
-      if (!resp.ok) {
-        throw new Error(`Erro ao buscar médicos! Status: ${resp.status}`);
-      }
-      const data = await resp.json();
-      setDoctors(data);
-    } catch (err) {
-      console.error("Erro ao buscar médicos:", err);
-      // Poderia definir um estado de erro para médicos se necessário
+      setLoading(false);
     }
   }, []);
 
-  const fetchPatients = useCallback(async () => { // Envolvido em useCallback
-    try {
-      // Assumindo que /api/patients retorna uma lista de pacientes com { id, name }
-      // Se a estrutura for diferente, ajuste o mapeamento ou o uso de getPatientName
-      const resp = await fetch("https://ezhealthluixz.netlify.app/api/patients"); // Caminho relativo
-      if (!resp.ok) {
-        throw new Error(`Erro ao buscar pacientes! Status: ${resp.status}`);
-      }
-      const data = await resp.json();
-      setPatients(data); // Espera-se que data seja um array de pacientes { id, name, ... }
-    } catch (err) {
-      console.error("Erro ao buscar pacientes:", err);
-      // Poderia definir um estado de erro para pacientes se necessário
-    }
-  }, []);
-
-  // Efeito para buscar dados iniciais e configurar polling para salas
   useEffect(() => {
-    fetchSalas(false); // Busca inicial de salas
-    fetchDoctors();
-    fetchPatients();
-
-    const intervalId = setInterval(() => {
-      fetchSalas(true); // Polling para salas
-    }, SALAS_POLLING_INTERVAL);
-
+    fetchData();
+    const intervalId = setInterval(fetchData, 30000);
     return () => clearInterval(intervalId);
-  }, [fetchSalas, fetchDoctors, fetchPatients]); // Incluindo todas as funções de fetch memoizadas
+  }, [fetchData]);
 
-  const openModal = (room = null) => {
-    setCurrentRoom(room);
-    setIsModalOpen(true);
-  };
+  // ✅ NOVO: Hook useMemo para calcular médicos disponíveis para o formulário
+  const availableDoctors = useMemo(() => {
+    // 1. Pega os IDs de todos os médicos já alocados em alguma sala.
+    const assignedDoctorIds = salas
+      .map(sala => sala.doctorId?._id)
+      .filter(id => id != null); // Filtra para remover valores nulos ou indefinidos
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setCurrentRoom(null);
-  };
+    // 2. Filtra a lista principal de médicos
+    return doctors.filter(doctor => {
+      // O médico que está na sala que estamos editando atualmente
+      const isDoctorInCurrentRoom = doctor._id === currentRoom?.doctorId?._id;
+      
+      // O médico está disponível se:
+      // a) Ele não está na lista de médicos já alocados, OU
+      // b) Ele é o médico que já está na sala que estamos editando.
+      return !assignedDoctorIds.includes(doctor._id) || isDoctorInCurrentRoom;
+    });
+  }, [salas, doctors, currentRoom]); // Recalcula quando salas, médicos ou a sala atual mudarem
 
   const handleSaveRoom = async (roomData) => {
-    if (!roomData.name || !roomData.name.trim()) { // Checagem mais robusta
-      setAlertTitle("Atenção!");
-      setAlertMessage("O nome da sala não pode ser vazio.");
-      setIsAlertDialogOpen(true);
-      return;
-    }
-
-    // Prepara os dados a serem enviados, excluindo o ID do corpo para PUT
-    const dataToSend = {
-      name: roomData.name,
-      type: roomData.type,
-      doctorId: roomData.doctorId || null, // Garante null se vazio
-      patientId: roomData.patientId || null, // Garante null se vazio
-    };
-
     try {
-      let resp;
-      let successMessage = "";
+      const isEditing = !!currentRoom;
+      const url = isEditing ? `/api/salas?id=${currentRoom._id}` : '/api/salas';
+      const method = isEditing ? 'PUT' : 'POST';
 
-      if (currentRoom && currentRoom.id) { // Editando uma sala existente
-        // Para PUT, envia o ID na query string
-        resp = await fetch(`https://ezhealthluixz.netlify.app/salas?id=${currentRoom.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dataToSend), // Envia apenas os dados atualizáveis
-        });
-        successMessage = "Sala atualizada com sucesso!";
-      } else { // Adicionando uma nova sala
-        resp = await fetch("https://ezhealthluixz.netlify.app/api/salas", { // Caminho relativo
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dataToSend),
-        });
-        successMessage = "Sala adicionada com sucesso!";
-      }
-
-      if (!resp.ok) {
-        const errorData = await resp.json().catch(() => ({ message: "Erro desconhecido ao processar resposta." }));
-        throw new Error(errorData.message || `Erro HTTP! Status: ${resp.status}`);
-      }
+      const resp = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(roomData) });
+      const result = await resp.json();
+      if (!result.success) throw new Error(result.message);
 
       setAlertTitle("Sucesso!");
-      setAlertMessage(successMessage);
+      setAlertMessage(`Sala ${isEditing ? 'atualizada' : 'adicionada'} com sucesso!`);
       setIsAlertDialogOpen(true);
-
-      fetchSalas(); // Rebusca as salas para atualizar a UI
-      closeModal();
+      
+      fetchData();
     } catch (err) {
-      console.error("Erro ao salvar sala:", err);
       setAlertTitle("Erro!");
       setAlertMessage("Não foi possível salvar a sala: " + err.message);
       setIsAlertDialogOpen(true);
+    } finally {
+      setIsModalOpen(false);
     }
   };
-
-  const handleDelete = (roomId) => {
+  
+  const handleDelete = (room) => {
     setConfirmTitle("Confirmar Exclusão");
-    setConfirmMessage("Tem certeza que deseja excluir esta sala? Esta ação é irreversível e pode desocupar médico e paciente dela, se aplicável.");
+    setConfirmMessage(`Tem certeza que deseja excluir a sala "${room.name}"? Esta ação não pode ser desfeita.`);
     setConfirmAction(() => async () => {
       try {
-        const resp = await fetch(`https://ezhealthluixz.netlify.app/api/salas?id=${roomId}`, { // Caminho relativo e ID na query
-          method: "DELETE"
-        });
-
-        if (!resp.ok) {
-          const errorData = await resp.json().catch(() => ({ message: "Erro desconhecido ao processar resposta." }));
-          throw new Error(errorData.message || `Erro HTTP! Status: ${resp.status}`);
-        }
-
+        const resp = await fetch(`/api/salas?id=${room._id}`, { method: 'DELETE' });
+        const result = await resp.json();
+        if (!result.success) throw new Error(result.message);
+        
         setAlertTitle("Sucesso!");
         setAlertMessage("Sala removida com sucesso!");
         setIsAlertDialogOpen(true);
 
-        fetchSalas(); // Rebusca as salas
+        fetchData();
       } catch (err) {
-        console.error("Erro ao remover sala:", err);
         setAlertTitle("Erro!");
         setAlertMessage("Não foi possível remover a sala: " + err.message);
         setIsAlertDialogOpen(true);
@@ -229,210 +206,56 @@ export function SalasAdminTab() {
     });
     setIsConfirmModalOpen(true);
   };
-
-  // Funções para obter nomes. Assumem que 'doctors' e 'patients' são arrays de objetos com 'id' e 'nome'/'name'.
-  const getDoctorName = (doctorId) => {
-    if (!doctorId) return 'Não atribuído';
-    return doctors.find(doc => doc.id === doctorId)?.nome || 'Médico desconhecido';
-  };
-
-  const getPatientName = (patientId) => {
-    if (!patientId) return 'Nenhum';
-    // Assume que sua API /api/patients retorna objetos com 'id' e 'name'
-    return patients.find(pat => pat.id === patientId)?.name || 'Paciente desconhecido';
-  };
-
-
-  function RoomFormModal({ isOpen, onClose, onSave, roomToEdit, doctors, patients: allPatients, salas: allSalas }) {
-    const [name, setName] = useState('');
-    const [type, setType] = useState('Geral');
-    const [selectedDoctorId, setSelectedDoctorId] = useState('');
-    const [selectedPatientId, setSelectedPatientId] = useState('');
   
-    useEffect(() => {
-      if (isOpen) {
-        setName(roomToEdit?.name || '');
-        setType(roomToEdit?.type || 'Geral');
-        setSelectedDoctorId(roomToEdit?.doctorId || '');
-        setSelectedPatientId(roomToEdit?.patientId || '');
-      } else {
-        // Resetar ao fechar para não persistir dados entre aberturas
-        setName('');
-        setType('Geral');
-        setSelectedDoctorId('');
-        setSelectedPatientId('');
-      }
-    }, [isOpen, roomToEdit]);
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      onSave({ name, type, doctorId: selectedDoctorId, patientId: selectedPatientId });
-    };
-  
-    if (!isOpen) return null;
-
-    // Pacientes disponíveis: aqueles não atribuídos a NENHUMA OUTRA sala.
-    // Se estiver editando, o paciente atual da sala também deve ser uma opção válida.
-    const availablePatients = allPatients.filter(p => {
-      const roomPatientIsIn = allSalas.find(s => s.patientId === p.id);
-      if (!roomPatientIsIn) return true; // Paciente está livre
-      if (roomToEdit && roomPatientIsIn.id === roomToEdit.id) return true; // Paciente está nesta sala (editando)
-      return false; // Paciente está em outra sala
-    });
-  
-    return (
-      <div className="fixed inset-0 bg-slate-600 bg-opacity-50 flex items-center justify-center z-[52] p-4">
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-md">
-          <Heading as="h3" text={roomToEdit ? "Editar Sala" : "Adicionar Nova Sala"} colorClass="dark:text-orangeDark text-orange" className="mb-4 text-lg sm:text-lg text-center" />
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="roomName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nome da Sala:</label>
-              <input type="text" id="roomName" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white" required />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="roomType" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo da Sala:</label>
-              <select id="roomType" value={type} onChange={(e) => setType(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white">
-                <option value="Geral">Geral</option>
-                <option value="Consultório">Consultório</option>
-                <option value="Emergência">Emergência</option>
-                <option value="Exames">Exames</option>
-                <option value="Internação">Internação</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="doctor" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Médico na Sala:</label>
-              <select id="doctor" value={selectedDoctorId} onChange={(e) => setSelectedDoctorId(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white">
-                <option value="">-- Nenhum Médico --</option>
-                {doctors.map(doc => (
-                  <option key={doc.id} value={doc.id}>{doc.nome}</option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-6">
-              <label htmlFor="patient" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Paciente na Sala:</label>
-              <select id="patient" value={selectedPatientId} onChange={(e) => setSelectedPatientId(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white">
-                <option value="">-- Nenhum Paciente --</option>
-                {availablePatients.map(pat => (
-                  <option key={pat.id} value={pat.id}>{pat.name}</option>
-                ))}
-                {/* Se o paciente atualmente na sala (ao editar) não estiver na lista de `availablePatients` 
-                    (ex: foi inativado mas ainda está na sala), adiciona-o como opção.
-                    Isto é um caso de borda, idealmente `availablePatients` já o conteria se ele existir e estiver nesta sala.
-                */}
-                {roomToEdit && roomToEdit.patientId && !availablePatients.some(p => p.id === roomToEdit.patientId) && (
-                    <option key={roomToEdit.patientId} value={roomToEdit.patientId}>
-                        {getPatientName(roomToEdit.patientId)} (Atualmente na sala)
-                    </option>
-                )}
-              </select>
-            </div>
-            <div className="flex justify-end gap-3">
-              <button type="button" onClick={onClose} className="px-4 py-2 bg-slate-200 text-slate-800 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">Cancelar</button>
-              <ButtonPrimary type="submit">{roomToEdit ? "Salvar Alterações" : "Adicionar Sala"}</ButtonPrimary>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  }
-  
-
-  if (loadingSalas) { // Usa o estado de loading específico para salas
-    return (
-      <div className="flex items-center justify-center h-full p-4">
-        <p className="text-slate-500 dark:text-slate-400">Carregando salas...</p>
-      </div>
-    );
-  }
-
-  if (errorSalas) { // Usa o estado de erro específico para salas
-    return (
-      <div className="flex items-center justify-center h-full p-4 text-center">
-        <p className="text-red-500 dark:text-red-400">{errorSalas}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-4 sm:p-6 bg-white dark:bg-white/10 rounded-lg shadow-md">
-      <Heading as="h2" text="Gerenciamento de Salas" colorClass="dark:text-orangeDark text-orange" className="mb-3 text-2xl sm:text-3xl" />
-      <ParagraphBlue className="mb-4 sm:mb-6 text-sm sm:text-base">
-        Visualize, adicione, edite e organize as salas de atendimento.
-        {isPollingSalas && <span className="ml-2 text-xs opacity-70">(Atualizando...)</span>}
-      </ParagraphBlue>
-
-      <div className="mb-4 sm:mb-6 text-right">
-        <ButtonPrimary onClick={() => openModal()} className="w-full sm:w-auto inline-flex items-center gap-2">
-          <PlusCircleIcon className="h-5 w-5" />
-          Adicionar Sala
+    <div className="p-6 bg-white dark:bg-white/10 rounded-lg shadow-md">
+      <Heading as="h2" text="Gerenciamento de Salas" colorClass="dark:text-orangeDark text-orange" className="mb-3" />
+      <ParagraphBlue className="mb-6">Adicione, edite e organize as salas de atendimento.</ParagraphBlue>
+      
+      <div className="mb-6 text-right">
+        <ButtonPrimary onClick={() => { setCurrentRoom(null); setIsModalOpen(true); }} className="inline-flex items-center gap-2">
+          <PlusCircleIcon className="h-5 w-5" /> Adicionar Sala
         </ButtonPrimary>
       </div>
 
-      {salas.length === 0 ? (
-        <ParagraphBlue className="text-center py-6 sm:py-8 text-slate-500 dark:text-slate-400">
-          Nenhuma sala cadastrada. Adicione uma nova sala para começar!
-        </ParagraphBlue>
-      ) : (
-        <div className="overflow-x-auto rounded-lg shadow">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-50 dark:bg-slate-700">
-              <tr>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider dark:text-slate-300">Nome da Sala</th>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider dark:text-slate-300">Tipo</th>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider dark:text-slate-300">Médico na Sala</th>
-                <th scope="col" className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider dark:text-slate-300">Paciente na Sala</th>
-                <th scope="col" className="relative px-3 py-2 sm:px-6 sm:py-3"><span className="sr-only">Ações</span></th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-white/10 divide-y divide-slate-200 dark:divide-slate-700">
-              {salas.map((room) => (
-                <tr key={room.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-DarkBlue dark:text-white">{room.name}</td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{room.type}</td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{getDoctorName(room.doctorId)}</td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">
-                    <span className={`${room.patientId ? 'font-semibold text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'}`}>
-                        {getPatientName(room.patientId)}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => openModal(room)} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-200 mr-3 p-1 rounded hover:bg-blue-100 dark:hover:bg-slate-700" title="Editar">
-                      <PencilSquareIcon className="h-5 w-5 inline" />
-                    </button>
-                    <button onClick={() => handleDelete(room.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200 p-1 rounded hover:bg-red-100 dark:hover:bg-slate-700" title="Excluir">
-                      <TrashIcon className="h-5 w-5 inline" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {loading && salas.length === 0 ? <p className="text-center py-8">Carregando...</p> : 
+        error ? <p className="text-center py-8 text-red-500">{error}</p> : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {salas.map((room) => (
+            <div key={room._id} className={`rounded-lg shadow-lg border p-5 flex flex-col justify-between ${room.patientId ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}>
+              <div>
+                <div className="flex justify-between items-start">
+                  <h3 className="text-lg font-bold text-slate-800">{room.name}</h3>
+                  <span className={`px-3 py-1 text-xs font-semibold rounded-full ${room.patientId ? 'bg-blue-200 text-blue-800' : 'bg-green-200 text-green-800'}`}>
+                    {room.status}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-500 mb-4">{room.type}</p>
+                
+                <div className="text-sm space-y-2 text-slate-700">
+                    <div className="flex items-center gap-2"><UserGroupIcon className="h-5 w-5" /><span>Paciente: <span className="font-semibold">{room.patientId?.nome || 'Nenhum'}</span></span></div>
+                    <div className="flex items-center gap-2"><UserIcon className="h-5 w-5" /><span>Médico: <span className="font-semibold">{room.doctorId?.nome || 'Não atribuído'}</span></span></div>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end gap-2">
+                <button onClick={() => { setCurrentRoom(room); setIsModalOpen(true); }} className="p-2 rounded-md hover:bg-slate-200" title="Editar"><PencilSquareIcon className="h-5 w-5" /></button>
+                <button onClick={() => handleDelete(room)} className="p-2 rounded-md hover:bg-slate-200" title="Excluir"><TrashIcon className="h-5 w-5 text-red-500" /></button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      <RoomFormModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onSave={handleSaveRoom}
-        roomToEdit={currentRoom}
-        doctors={doctors}
-        patients={patients} // Passa a lista completa de pacientes para o modal
-        salas={salas}       // Passa a lista de salas para o modal (usado no filtro de pacientes)
-        getPatientName={getPatientName} // Passa a função para o modal, caso seja útil lá dentro
+      {/* ✅ ALTERADO: Passa a nova lista 'availableDoctors' para o modal */}
+      <RoomFormModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSave={handleSaveRoom} 
+        roomToEdit={currentRoom} 
+        doctors={availableDoctors} 
       />
-      <ConfirmationModal
-        isOpen={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)}
-        onConfirm={confirmAction}
-        title={confirmTitle}
-        message={confirmMessage}
-      />
-      <AlertDialog
-        isOpen={isAlertDialogOpen}
-        onClose={() => setIsAlertDialogOpen(false)}
-        title={alertTitle}
-        message={alertMessage}
-      />
+      <ConfirmationModal isOpen={isConfirmModalOpen} onClose={() => setIsConfirmModalOpen(false)} onConfirm={confirmAction} title={confirmTitle} message={confirmMessage} />
+      <AlertDialog isOpen={isAlertDialogOpen} onClose={() => setIsAlertDialogOpen(false)} title={alertTitle} message={alertMessage} />
     </div>
   );
 }

@@ -1,8 +1,11 @@
+// components/tabs/TriagensTab.jsx (VERSÃO REATORADA)
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Heading } from "@/components/typography/Heading";
 import { ParagraphBlue } from "@/components/theme/ParagraphBlue";
 import { ButtonPrimary } from "@/components/theme/ButtonPrimary";
-import { useRouter } from 'next/navigation';
 
 export function TriagensTab() {
   const [pendingTriagens, setPendingTriagens] = useState([]);
@@ -11,125 +14,69 @@ export function TriagensTab() {
   const intervalRef = useRef(null);
   const router = useRouter();
 
+  // Mapeamento de cores baseado nos nomes de cores retornados pela API
   const colorClasses = {
-    Vermelho: "bg-red-500 text-white",
-    Laranja: "bg-orange-500 text-white",
-    Amarelo: "bg-yellow-400 text-black",
-    Verde: "bg-green-500 text-white",
-    Azul: "bg-blue-500 text-white",
-    gray: "bg-zinc-300 text-zinc-800",
+    red: "bg-red-500 text-white",
+    orange: "bg-orange-500 text-white",
+    yellow: "bg-yellow-400 text-black",
+    green: "bg-green-500 text-white",
+    blue: "bg-blue-500 text-white",
+    default: "bg-zinc-300 text-zinc-800",
   };
 
-  function calculaTempoEspera(createdAtDate) {
+  const calculaTempoEspera = (createdAtDate) => {
     const now = new Date();
-    const diffMinutes = Math.floor((now - createdAtDate) / (1000 * 60));
+    const diffMinutes = Math.floor((now - new Date(createdAtDate)) / (1000 * 60));
     if (diffMinutes < 0) return "0 min";
+    if (diffMinutes < 60) return `${diffMinutes} min`;
+    
+    const diffHours = Math.floor(diffMinutes / 60);
+    const remainingMinutes = diffMinutes % 60;
+    return `${diffHours}h ${remainingMinutes}min`;
+  };
+  
+  const fetchTriagens = async () => {
+    // Não precisa de `setLoading(true)` aqui para evitar o piscar da tela a cada atualização
+    try {
+        // ✅ MUDANÇA: Usando a URL relativa e a nova API que já popula os dados
+        const response = await fetch('/api/triagem');
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+        
+        const result = await response.json();
+        if (!result.success) throw new Error(result.message);
 
-    if (diffMinutes < 60) {
-      return `${diffMinutes} min`;
-    } else {
-      const diffHours = Math.floor(diffMinutes / 60);
-      const remainingMinutes = diffMinutes % 60;
-      return `${diffHours} h ${remainingMinutes} min`;
-    }
-  }
-
-  useEffect(() => {
-    async function fetchTriagens() {
-      try {
-        const response = await fetch('https://ezhealthluixz.netlify.app/api/triagem');
-        if (!response.ok) {
-          throw new Error(`Erro HTTP! status: ${response.status}`);
-        }
-        const data = await response.json();
-
-        const formattedTriagens = data.map(triagem => {
-          // Usar optional chaining ao acessar dadosPessoalPaciente
-          const patientName = triagem.dadosPessoalPaciente?.nome || 'Paciente Desconhecido';
-
-          const urgencyClassification = triagem.classificacaoRisco || {
-            label: 'Não Classificado',
-            color: 'gray',
-            time: ''
-          };
-
-          // Garante que createdAt é um Date válido
-          const createdAtDate = triagem.createdAt ? new Date(triagem.createdAt) : new Date(); // Fallback para new Date() se createdAt estiver faltando
-
-          return {
-            id: triagem._id,
-            patient: patientName,
-            urgencyLabel: urgencyClassification.label,
-            urgencyColor: urgencyClassification.color,
-            urgencyTime: urgencyClassification.time,
-            createdAt: createdAtDate,
-            timeWaiting: calculaTempoEspera(createdAtDate),
-            fullTriagemData: triagem // Guarda o objeto original completo se necessário
-          };
-        })
-        // Filtra triagens que já possuem atendimentoInfo.status === 'Finalizado' ou similar, se desejar mostrar apenas 'pendentes'
-        // Por exemplo, se 'triagensPendentes' significa "não atribuídas" ou "não finalizadas":
-        .filter(triagem => triagem.fullTriagemData.atendimentoInfo?.status !== 'Finalizado' && triagem.fullTriagemData.atendimentoInfo?.status !== 'Em Atendimento');
-
-        setPendingTriagens(formattedTriagens);
-      } catch (err) {
-        console.error('Erro ao buscar triagens:', err);
-        setError('Não foi possível carregar as triagens. Tente novamente mais tarde.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchTriagens();
-
-    // Limpar o intervalo ao desmontar o componente
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, []); // Vazio para executar apenas uma vez na montagem
-
-  useEffect(() => {
-    // Só inicia o intervalo se o carregamento terminou e há triagens
-    if (loading || pendingTriagens.length === 0) {
-      if (intervalRef.current) { // Limpa se as condições não forem mais atendidas
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
-    }
-
-    // Inicia o intervalo se ainda não estiver ativo
-    if (!intervalRef.current) {
-      intervalRef.current = setInterval(() => {
-        setPendingTriagens(prev =>
-          prev.map(item => ({
-            ...item,
-            timeWaiting: calculaTempoEspera(item.createdAt)
-          }))
+        // ✅ MUDANÇA: A API já nos dá os dados prontos. Só filtramos os pendentes.
+        const pending = result.data.filter(t => 
+            t.atendimentoInfo?.status !== 'Finalizado' && t.atendimentoInfo?.status !== 'Em Atendimento'
         );
-      }, 60_000); // Atualiza a cada 1 minuto (60 segundos)
+        
+        setPendingTriagens(pending);
+        setError(null);
+    } catch (err) {
+        console.error('Erro ao buscar triagens:', err);
+        setError('Não foi possível carregar as triagens.');
+    } finally {
+        // Só muda o loading na primeira busca
+        if (loading) setLoading(false);
     }
+  };
 
-    // Limpeza ao desmontar ou quando as dependências mudam
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [loading, pendingTriagens.length]); // Depende de loading e do número de triagens
+  useEffect(() => {
+    fetchTriagens(); // Busca inicial
+    
+    // Configura um intervalo para buscar novas triagens e atualizar a lista
+    intervalRef.current = setInterval(fetchTriagens, 30000); // A cada 30 segundos
+
+    // Limpa o intervalo ao desmontar o componente
+    return () => clearInterval(intervalRef.current);
+  }, []); // O array de dependências vazio garante que o intervalo seja configurado apenas uma vez
 
   const handleStartTriagem = (triagemId) => {
-    router.push(`/painel-medico/${triagemId}`);
+    router.push(`/painel-medico/atendimento/${triagemId}`); // Rota mais semântica
   };
 
   const handleNewTriagem = () => {
-    alert("Abrir formulário para adicionar nova triagem manual!");
-    // Aqui você pode redirecionar para uma página de novo formulário de triagem
-    // router.push('/painel-medico/nova-triagem');
+    router.push('/triagem'); // Redireciona para o formulário de triagem
   };
 
   return (
@@ -140,85 +87,56 @@ export function TriagensTab() {
         colorClass="dark:text-orangeDark text-orange"
         className="mb-3 text-2xl sm:text-3xl"
       />
-      <ParagraphBlue className="mb-4 sm:mb-6 text-sm sm:text-base">
-        Pacientes aguardando triagem.
-      </ParagraphBlue>
-
-      <div className="mb-4 sm:mb-6 text-right">
+      <ParagraphBlue className="mb-6">Pacientes aguardando atendimento na fila.</ParagraphBlue>
+      
+      <div className="mb-6 text-right">
         <ButtonPrimary onClick={handleNewTriagem} className="w-full sm:w-auto">
-          + Nova Triagem Manual
+          + Registrar Nova Triagem
         </ButtonPrimary>
       </div>
 
       {loading ? (
-        <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base">
-          Carregando triagens...
-        </p>
+        <p className="text-zinc-500 text-center py-8">Carregando triagens...</p>
       ) : error ? (
-        <p className="text-red-500 dark:text-red-400 text-center py-6 sm:py-8 text-sm sm:text-base">
-          {error}
-        </p>
+        <p className="text-red-500 text-center py-8">{error}</p>
       ) : pendingTriagens.length > 0 ? (
         <div className="overflow-x-auto rounded-lg shadow">
           <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
             <thead className="bg-zinc-50 dark:bg-zinc-700">
               <tr>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                  Paciente
-                </th>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                  Urgência
-                </th>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                  Tempo de Espera
-                </th>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                  Responsável
-                </th>
-                <th className="relative px-3 py-2 sm:px-6 sm:py-3">
-                  <span className="sr-only">Ações</span>
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase">Paciente</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase">Urgência</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase">Tempo de Espera</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase">Responsável</th>
+                <th className="relative px-6 py-3"><span className="sr-only">Ações</span></th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-white/10 divide-y divide-zinc-200 dark:divide-zinc-700">
               {pendingTriagens.map((triagem) => {
-                const badgeClass = colorClasses[triagem.urgencyColor] || colorClasses.gray;
-
-                // Definindo o nome do médico de forma segura
-                const medicoNome = triagem.fullTriagemData.atendimentoInfo?.medico?.nome || 'Não Atribuído';
-
+                const badgeClass = colorClasses[triagem.classificacao?.color] || colorClasses.default;
                 return (
-                  <tr
-                    key={triagem.id}
-                    className="hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-DarkBlue dark:text-white">
-                      {triagem.patient}
+                  <tr key={triagem._id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-DarkBlue dark:text-white">
+                      {/* ✅ MUDANÇA: Acesso direto aos dados populados */}
+                      {triagem.patientId?.nome || 'Paciente não identificado'}
                     </td>
-
-                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm">
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}`}
-                      >
-                        {triagem.urgencyLabel} ({triagem.urgencyTime})
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}`}>
+                        {triagem.classificacao?.label || 'Não classificado'}
                       </span>
                     </td>
-
-                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">
-                      {triagem.timeWaiting}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">
+                      {calculaTempoEspera(triagem.createdAt)}
                     </td>
-
-                    {/* AQUI ESTÁ A CORREÇÃO PRINCIPAL */}
-                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-DarkBlue dark:text-white">
-                      {medicoNome}
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-DarkBlue dark:text-white">
+                      {triagem.atendimentoInfo.medicoId?.nome || 'Não Atribuído'}
                     </td>
-
-                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
-                        onClick={() => handleStartTriagem(triagem.id)}
-                        className="underline text-orange-600 hover:text-orange-900 dark:text-orange dark:hover:text-orange/80 focus:outline-none"
+                        onClick={() => handleStartTriagem(triagem._id)}
+                        className="underline text-orange-600 hover:text-orange-900 dark:text-orange"
                       >
-                        Iniciar
+                        Iniciar Atendimento
                       </button>
                     </td>
                   </tr>
@@ -228,9 +146,7 @@ export function TriagensTab() {
           </table>
         </div>
       ) : (
-        <p className="text-zinc-500 dark:text-zinc-400 text-center py-6 sm:py-8 text-sm sm:text-base">
-          Nenhuma triagem pendente no momento.
-        </p>
+        <p className="text-zinc-500 text-center py-8">Nenhuma triagem pendente no momento.</p>
       )}
     </div>
   );

@@ -1,24 +1,8 @@
-// pages/api/notifications.js
-import { MongoClient } from 'mongodb';
+// pages/api/notifications.js (VERSÃO REATORADA COM MONGOOSE)
 
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB_NAME || 'ezhealth_db';
-let clientPromise;
-
-if (!uri) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
-
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromiseNotifications) {
-    const client = new MongoClient(uri);
-    global._mongoClientPromiseNotifications = client.connect();
-  }
-  clientPromise = global._mongoClientPromiseNotifications;
-} else {
-  const client = new MongoClient(uri);
-  clientPromise = client.connect();
-}
+import connectDB from '@/lib/mongodb';
+import Triage from '@/model/Triage';
+import Appointment from '@/model/Appointment';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -27,83 +11,81 @@ export default async function handler(req, res) {
   }
 
   try {
-    const client = await clientPromise;
-    const db = client.db(dbName);
-
-    const triagensColl = db.collection('triagens');
-    const appointmentsColl = db.collection('appointments');
-    // const messagesColl = db.collection('messages'); // Removido por não estar no escopo atual
-
+    await connectDB();
+    let notifications = [];
     const now = new Date();
-    // Buscar eventos das últimas 24 horas (ou outro período relevante)
     const twentyFourHoursAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
 
-    let notifications = [];
-
-    // --- Notificações de Novas Triagens Pendentes (últimos 24h) ---
-    const newTriages = await triagensColl.find(
-      {
-        createdAt: { $gte: twentyFourHoursAgo },
-        'atendimentoInfo.status': { $ne: 'Finalizado' } // Triagens não finalizadas
-      },
-      { projection: { _id: 1, 'dadosPessoalPaciente.nome': 1, 'classificacaoRisco.color': 1, createdAt: 1, 'atendimentoInfo.medico.nome': 1 } } // Adicionado atendimentoInfo.medico.nome
-    ).sort({ createdAt: -1 }).limit(5).toArray();
+    // --- Notificações de Novas Triagens Pendentes ---
+    // ANTES: find com projection e acesso a 'dadosPessoalPaciente.nome'
+    // DEPOIS: find com .populate() para buscar os dados do paciente e do médico diretamente
+    const newTriages = await Triage.find({
+      createdAt: { $gte: twentyFourHoursAgo },
+      'atendimentoInfo.status': { $in: ['Aguardando Triagem', 'Aguardando Atendimento', 'Pendente'] }
+    })
+    .populate('patientId', 'nome') // Popula o nome do paciente
+    .populate('atendimentoInfo.medicoId', 'nome') // Popula o nome do médico
+    .sort({ createdAt: -1 })
+    .limit(5);
 
     newTriages.forEach(triage => {
-      const patientName = triage.dadosPessoalPaciente?.nome || 'Paciente Desconhecido';
-      const color = triage.classificacaoRisco?.color;
-      const assignedMedico = triage.atendimentoInfo?.medico?.nome; // Nome do médico atribuído
+      const patientName = triage.patientId?.nome || 'Paciente Desconhecido';
+      const assignedMedico = triage.atendimentoInfo.medicoId?.nome;
+      const color = triage.classificacao?.color || 'rgba(0, 0, 255, 0.5)'; // Pega a cor diretamente
+      
       let icon = "🔔";
-      let colorClass = "text-yellow-600"; // Padrão para triagens pendentes
-
-      if (color === 'Vermelho') {
+      let colorClass = "text-yellow-600";
+      
+      // Simplificando a lógica de cores
+      if (triage.classificacao?.priority === 1) { // Emergência
         icon = "🚨";
         colorClass = "text-red-600";
-      } else if (color === 'Laranja') {
+      } else if (triage.classificacao?.priority === 2) { // Muito Urgente
         icon = "⚠️";
         colorClass = "text-orange-600";
       }
-
-      let notificationText = `Nova triagem pendente: ${patientName}`;
+      
+      let notificationText = `Nova triagem para ${patientName}`;
       if (assignedMedico) {
-        notificationText += ` (Médico: ${assignedMedico})`;
+        notificationText += ` com Dr(a). ${assignedMedico}`;
       }
 
       notifications.push({
         id: triage._id.toString(),
         type: 'new_triage',
-        icon: icon,
-        text: notificationText, // Texto com nome do médico
+        icon,
+        text: notificationText,
         color: colorClass,
         timestamp: triage.createdAt,
-        link: `/painel-medico/${triage._id.toString()}` // Link para detalhes da triagem
+        link: `/painel-medico/triagens/${triage._id.toString()}`
       });
     });
 
-    // --- Notificações de Consultas Agendadas para Hoje (Exemplo) ---
-    // Ajustado para buscar 'patientName' e 'time' diretamente, se aplicável na sua coleção.
-    // Se o nome do paciente estiver dentro de 'dadosPessoalPaciente.nome', ajuste a projeção.
-    // Se a consulta também tiver um médico atribuído, pode adicionar aqui.
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    // --- Notificações de Consultas Agendadas para Hoje ---
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(todayStart);
+    todayEnd.setDate(todayStart.getDate() + 1);
 
-    const newAppointmentsToday = await appointmentsColl.find(
-        {
-            // Assumindo que 'date' é string 'YYYY-MM-DD'
-            date: { $gte: todayStart.toISOString().split('T')[0], $lt: todayEnd.toISOString().split('T')[0] },
-            // Se você tiver um campo `createdAt` para agendamento, pode usar
-            // createdAt: { $gte: twentyFourHoursAgo }
-        },
-        { projection: { _id: 1, 'patientName': 1, 'date': 1, 'time': 1, 'medico.nome': 1 } } // Adicione 'medico.nome' se consultas tiverem
-    ).sort({ date: 1, time: 1 }).limit(3).toArray();
+    // ANTES: find com 'date' como string e projection manual
+    // DEPOIS: find com 'date' como ISODate (correto) e .populate()
+    const newAppointmentsToday = await Appointment.find({
+      date: { $gte: todayStart, $lt: todayEnd },
+      status: 'Agendado'
+    })
+    .populate('patientId', 'nome')
+    .populate('doctorId', 'nome')
+    .sort({ date: 1 })
+    .limit(5);
 
     newAppointmentsToday.forEach(appointment => {
-        const appointmentTime = appointment.time || 'horário não definido';
-        const appointedMedico = appointment.medico?.nome; // Se consultas também tiverem médico
+        const patientName = appointment.patientId?.nome || 'Paciente';
+        const doctorName = appointment.doctorId?.nome;
+        const appointmentTime = new Date(appointment.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-        let notificationText = `Consulta agendada com ${appointment.patientName || 'Paciente'} às ${appointmentTime}`;
-        if (appointedMedico) {
-          notificationText += ` (Médico: ${appointedMedico})`;
+        let notificationText = `Consulta com ${patientName} às ${appointmentTime}`;
+        if (doctorName) {
+            notificationText += ` (Dr(a). ${doctorName})`;
         }
 
         notifications.push({
@@ -112,22 +94,19 @@ export default async function handler(req, res) {
             icon: "📅",
             text: notificationText,
             color: "text-blue-600",
-            timestamp: new Date(appointment.date),
+            timestamp: appointment.date,
             link: `/painel-medico/consultas/${appointment._id.toString()}`
         });
     });
 
-    // --- Ordenar notificações por timestamp (mais recente primeiro) ---
+    // --- Ordenar e Limitar Notificações ---
     notifications.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    const finalNotifications = notifications.slice(0, 10);
 
-    // Limitar o número total de notificações a serem exibidas
-    const MAX_NOTIFICATIONS = 10;
-    const finalNotifications = notifications.slice(0, MAX_NOTIFICATIONS);
-
-    return res.status(200).json(finalNotifications);
+    return res.status(200).json({ success: true, data: finalNotifications });
 
   } catch (error) {
     console.error('Erro em /api/notifications:', error);
-    return res.status(500).json({ message: 'Erro interno no servidor', error: error.message });
+    return res.status(500).json({ success: false, message: 'Erro interno no servidor', error: error.message });
   }
 }
