@@ -1,7 +1,7 @@
 // pages/api/generate-report.js (VERSÃO REATORADA COM MONGOOSE)
 
 import connectDB from '@/lib/mongodb';
-import Triage from '@/models/Triage';
+import Triage from '@/model/Triage';
 // Os modelos Patient e Doctor são usados implicitamente pelo .populate()
 import PDFDocument from 'pdfkit';
 

@@ -3,7 +3,7 @@
 ![Logo EZHealth](coverGitHub.png)
 
 ## Oque é:
-O EZHealth é um software de triagem rápida e inteligente para hospitais e consultórios, agilizando o atendimento por meio de check-in digital, formulário de triagem e direcionamento automático ao especialista.
+O EZHealth é um Aplicativo Web de triagem rápida e inteligente para hospitais e consultórios, Aonde agilizando (Automatiza) o atendimento por meio de check-in digital, formulário de triagem e Sinal Vitais fazendo o direcionamento automático ao especialista.
 
 Conta com uma opção de emergência para
 priorizar pacientes em estado crítico. 
