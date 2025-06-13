@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Chatbot from "@/components/ChatBot/Chatbot";
 import VLibras2 from "@/components/Acessibilidade/VLibras";
+import { TimerApresentacao } from "@/components/timerApresentation/timerApreset";
 // import VLibras from 'vlibras-nextjs'
 // REMOVA: import Script from 'next/script'; // Não precisamos mais importar Script aqui diretamente para o Hand Talk
 
@@ -49,7 +50,7 @@ export default function RootLayout({ children }) {
         {/* --- Renderiza o HandTalkScript Client Component --- */}
         {/* Ele mesmo conterá o <Script> e suas lógicas de onLoad/onError */}
         <VLibras2 /> 
-        
+        <TimerApresentacao/>
       </body>
     </html>
   );
