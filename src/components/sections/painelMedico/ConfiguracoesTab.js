@@ -120,7 +120,7 @@ export function ConfiguracoesTab() {
       />
       <div
         onClick={onChange}
-        className="relative w-14 h-8 bg-neutral-300 dark:bg-neutral-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 dark:peer-focus:ring-orange-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-neutral-300 after:rounded-full after:h-7 after:w-7 after:transition-all dark:border-neutral-600 peer-checked:bg-orange-600 cursor-pointer"
+        className="relative w-14 h-8 bg-neutral-300 dark:bg-neutral-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange dark:peer-focus:ring-orange rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-neutral-300 after:rounded-full after:h-7 after:w-7 after:transition-all dark:border-neutral-600 peer-checked:bg-orange cursor-pointer"
       ></div>
     </>
   );
@@ -194,7 +194,7 @@ export function ConfiguracoesTab() {
                 id="languageSelect"
                 value={language}
                 onChange={handleLanguageChange}
-                className="w-full p-2 rounded-md border-2 border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-blue-900 dark:text-neutral-100 focus:outline-none focus:border-orange-500 text-sm sm:text-base"
+                className="w-full p-2 rounded-md border-2 border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-blue-900 dark:text-neutral-100 focus:outline-none focus:border-orange text-sm sm:text-base"
               >
                 <option value="pt-BR">Português (Brasil)</option>
                 <option value="en-US">English (US)</option>

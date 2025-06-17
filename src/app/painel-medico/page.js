@@ -46,7 +46,7 @@ function Sidebar({ medico, activeTab, setActiveTab, onLogout }) {
 
             <aside className={`
                 bg-white dark:bg-themeDark md:dark:bg-white/5 p-6 space-y-6 shadow-lg border-r border-zinc-200 dark:border-zinc-800
-                fixed inset-y-0 left-0 z-50 w-64
+                sticky top-0 inset-y-0 left-0 z-50 w-64 min-h-screen
                 transform transition-transform duration-300 ease-in-out
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 md:relative md:translate-x-0 md:flex-shrink-0 flex flex-col

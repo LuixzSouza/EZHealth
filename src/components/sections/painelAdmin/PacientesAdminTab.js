@@ -72,17 +72,17 @@ function PatientFormModal({ isOpen, onClose, onSave, pacienteToEdit }) {
             {/* Campos do formulário */}
             <div>
                 <label htmlFor="nome" className="block text-sm font-medium">Nome Completo</label>
-                <input id="nome" type="text" {...register("nome", { required: "Nome é obrigatório" })} className="mt-1 block w-full input-style" />
+                <input id="nome" type="text" {...register("nome", { required: "Nome é obrigatório" })} className="mt-1 block w-full input-style p-1 text-black" />
                 {errors.nome && <p className="text-red-500 text-xs mt-1">{errors.nome.message}</p>}
             </div>
             <div>
                 <label htmlFor="cpf" className="block text-sm font-medium">CPF</label>
-                <input id="cpf" type="text" {...register("cpf", { required: "CPF é obrigatório" })} className="mt-1 block w-full input-style" />
+                <input id="cpf" type="text" {...register("cpf", { required: "CPF é obrigatório" })} className="mt-1 block w-full input-style p-1 text-black" />
                 {errors.cpf && <p className="text-red-500 text-xs mt-1">{errors.cpf.message}</p>}
             </div>
             <div>
                 <label htmlFor="dataNascimento" className="block text-sm font-medium">Data de Nascimento</label>
-                <input id="dataNascimento" type="date" {...register("dataNascimento")} className="mt-1 block w-full input-style" />
+                <input id="dataNascimento" type="date" {...register("dataNascimento")} className="mt-1 block w-full input-style p-1 text-black" />
             </div>
             {/* Botões de ação */}
             <div className="flex justify-end gap-3 pt-4">

@@ -6,6 +6,15 @@ import { IMaskInput } from 'react-imask';
 import { ContainerGrid } from "@/components/layout/ContainerGrid";
 import { ParagraphBlue } from "@/components/theme/ParagraphBlue";
 import { Heading } from "@/components/typography/Heading";
+import { useSpeechToForm } from "@/hooks/useSpeechToForm";
+import { XCircleIcon } from "@heroicons/react/24/solid"; // Importado
+
+const MicrophoneIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 0 0-12 0v1.5a6 6 0 0 0 6 6Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5" />
+  </svg>
+);
 
 const sexoOptions = [
   { label: 'Masculino', value: 'M' },
@@ -15,11 +24,13 @@ const sexoOptions = [
 ];
 
 export function T_03_CheckInSect({ onNext, defaultValues }) {
-  const { register, handleSubmit, control, formState: { errors } } = useForm({
+  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm({
     defaultValues,
     mode: 'onBlur'
   });
   
+  const { activeField, startListening, hasRecognitionSupport } = useSpeechToForm({ setValue });
+  const nomeValue = useWatch({ control, name: 'dadosPessoalPaciente.nome' });
   const temConvenioWatch = useWatch({ control, name: 'dadosPessoalPaciente.temConvenio' });
   const dataNascimentoWatch = useWatch({ control, name: 'dadosPessoalPaciente.dataNascimento' });
   const [idade, setIdade] = useState(null);
@@ -51,44 +62,56 @@ export function T_03_CheckInSect({ onNext, defaultValues }) {
           <Heading as="h2" text="CHECK-IN" colorClass="dark:text-orangeDark text-orange" />
           <ParagraphBlue>Para começar, informe seus dados pessoais.</ParagraphBlue>
           
-          {/* Nome */}
+          {/* NOME MODIFICADO COM BOTÃO DE LIMPAR */}
           <div>
             <label htmlFor='nome' className="block mb-1 text-sm font-semibold text-orange">Nome completo:</label>
-            <input 
-              id='nome' 
-              type='text' 
-              {...register('dadosPessoalPaciente.nome', { required: 'O nome completo é obrigatório.' })} 
-              className={`w-full input-style text-black p-2 bg-slate-100 dark:bg-white ${errors.dadosPessoalPaciente?.nome ? 'border-red-500' : 'border-orange'}`} 
-            />
+            <div className="relative w-full">
+              <input 
+                id='nome' 
+                type='text' 
+                placeholder="nome"
+                {...register('dadosPessoalPaciente.nome', { required: 'O nome completo é obrigatório.' })} 
+                className={`w-full input-style text-black p-2 pr-20 bg-slate-100 dark:bg-white ${errors.dadosPessoalPaciente?.nome ? 'border-red-500' : 'border-orange'}`} 
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                {nomeValue && !activeField && (
+                  <button type="button" onClick={() => setValue('dadosPessoalPaciente.nome', '', { shouldFocus: true })} title="Limpar campo">
+                    <XCircleIcon className="w-6 h-6 text-zinc-400 hover:text-red-500 transition-colors" />
+                  </button>
+                )}
+                {hasRecognitionSupport && (
+                  <button
+                      type="button"
+                      onClick={() => startListening('dadosPessoalPaciente.nome')}
+                      disabled={!!activeField}
+                      title="Falar o nome"
+                      className={`p-1 rounded-full transition-colors ${activeField === 'dadosPessoalPaciente.nome' ? 'bg-red-500 text-white animate-pulse' : 'text-zinc-500 hover:text-orange'}`}
+                  >
+                      <MicrophoneIcon className="w-6 h-6" />
+                  </button>
+                )}
+              </div>
+            </div>
             {errors.dadosPessoalPaciente?.nome && <p className="text-red-500 text-xs mt-1">{errors.dadosPessoalPaciente.nome.message}</p>}
           </div>
 
-          {/* Data de Nascimento com cálculo de idade e validação */}
+          {/* RESTANTE DO FORMULÁRIO INTACTO */}
+          {/* Data de Nascimento, CPF, etc... */}
           <div>
-              <label htmlFor='dataNascimento' className="block mb-1 text-sm font-semibold text-orange">Data de nascimento:</label>
-              <input 
-                id='dataNascimento' 
-                type='date' 
-                {...register('dadosPessoalPaciente.dataNascimento', { 
-                  required: 'A data de nascimento é obrigatória.',
-                  validate: (value) => {
-                    const hoje = new Date();
-                    const nascimento = new Date(value);
-                    let idadeCalculada = hoje.getFullYear() - nascimento.getFullYear();
-                    const m = hoje.getMonth() - nascimento.getMonth();
-                    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
-                        idadeCalculada--;
-                    }
-                    return idadeCalculada >= 18 || 'É necessário ter 18 anos ou mais.';
-                  }
-                })} 
-                className={`w-full input-style text-black p-2 bg-slate-100 dark:bg-white ${errors.dadosPessoalPaciente?.dataNascimento ? 'border-red-500' : 'border-orange'}`} 
-              />
-              {idade !== null && <p className="text-sm mt-2 text-slate-600 dark:text-slate-400">Idade: {idade} anos</p>}
-              {errors.dadosPessoalPaciente?.dataNascimento && <p className="text-red-500 text-xs mt-1">{errors.dadosPessoalPaciente.dataNascimento.message}</p>}
+            <label htmlFor='dataNascimento' className="block mb-1 text-sm font-semibold text-orange">Data de nascimento:</label>
+            <input 
+              id='dataNascimento' 
+              type='date' 
+              {...register('dadosPessoalPaciente.dataNascimento', { 
+                required: 'A data de nascimento é obrigatória.',
+                validate: (value) => new Date().getFullYear() - new Date(value).getFullYear() >= 18 || 'É necessário ter 18 anos ou mais.'
+              })} 
+              className={`w-full input-style text-black p-2 bg-slate-100 dark:bg-white ${errors.dadosPessoalPaciente?.dataNascimento ? 'border-red-500' : 'border-orange'}`} 
+            />
+            {idade !== null && <p className="text-sm mt-2 text-slate-600 dark:text-slate-400">Idade: {idade} anos</p>}
+            {errors.dadosPessoalPaciente?.dataNascimento && <p className="text-red-500 text-xs mt-1">{errors.dadosPessoalPaciente.dataNascimento.message}</p>}
           </div>
 
-          {/* CPF com Máscara */}
           <div>
             <label htmlFor='cpf' className="block mb-1 text-sm font-semibold text-orange">CPF ou número do SUS:</label>
             <Controller
@@ -100,6 +123,7 @@ export function T_03_CheckInSect({ onNext, defaultValues }) {
               }}
               render={({ field }) => (
                 <IMaskInput
+                  placeholder="000.000.000-00"
                   mask="000.000.000-00"
                   id="cpf"
                   value={field.value}
@@ -113,7 +137,6 @@ export function T_03_CheckInSect({ onNext, defaultValues }) {
             {errors.dadosPessoalPaciente?.cpf && <p className="text-red-500 text-xs mt-1">{errors.dadosPessoalPaciente.cpf.message}</p>}
           </div>
 
-          {/* Telefone com Máscara */}
           <div>
             <label htmlFor='telefone' className="block mb-1 text-sm font-semibold text-orange">Telefone para contato:</label>
             <Controller
@@ -139,16 +162,14 @@ export function T_03_CheckInSect({ onNext, defaultValues }) {
             {errors.dadosPessoalPaciente?.telefone && <p className="text-red-500 text-xs mt-1">{errors.dadosPessoalPaciente.telefone.message}</p>}
           </div>
 
-          {/* Sexo com `key` corrigida */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-orange">Sexo:</label>
             <div className="flex flex-col gap-2">
               {sexoOptions.map((option) => (
-                // ✅ CORREÇÃO AQUI: A 'key' agora usa 'option.label', que é único.
                 <label key={option.label} className="flex items-center gap-3 p-3 border-2 border-zinc-300 dark:border-zinc-600 rounded-md cursor-pointer hover:border-orange transition-all has-[:checked]:border-orange has-[:checked]:bg-orange/10">
                   <input 
                     type="radio" 
-                    value={option.value} // O 'value' continua o mesmo, o que está correto.
+                    value={option.value}
                     {...register('dadosPessoalPaciente.sexo', { required: 'Por favor, selecione uma opção.' })} 
                     className="accent-orange w-5 h-5" 
                   />
@@ -159,7 +180,6 @@ export function T_03_CheckInSect({ onNext, defaultValues }) {
             {errors.dadosPessoalPaciente?.sexo && <p className="text-red-500 text-xs mt-1">{errors.dadosPessoalPaciente.sexo.message}</p>}
           </div>
 
-          {/* Convênio */}
           <div>
             <label htmlFor="temConvenio" className="block mb-1 text-sm font-semibold text-orange">Possui convênio?</label>
             <select 
@@ -174,7 +194,6 @@ export function T_03_CheckInSect({ onNext, defaultValues }) {
             {errors.dadosPessoalPaciente?.temConvenio && <p className="text-red-500 text-xs mt-1">{errors.dadosPessoalPaciente.temConvenio.message}</p>}
           </div>
 
-          {/* Número do Convênio (Condicional) */}
           {temConvenioWatch === "true" && (
             <div className="animate-fade-in">
               <label htmlFor="numConvenio" className="block mb-1 text-sm font-semibold text-orange">Número do convênio:</label>

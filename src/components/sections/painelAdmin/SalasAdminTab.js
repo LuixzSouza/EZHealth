@@ -63,11 +63,11 @@ function RoomFormModal({ isOpen, onClose, onSave, roomToEdit, doctors }) {
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium">Nome da Sala</label>
-            <input id="name" type="text" {...register("name", { required: true })} className="mt-1 block w-full input-style" />
+            <input id="name" type="text" {...register("name", { required: true })} className="mt-1 block w-full input-style p-1 text-black" />
           </div>
           <div>
             <label htmlFor="type" className="block text-sm font-medium">Tipo da Sala</label>
-            <select id="type" {...register("type")} className="mt-1 block w-full input-style">
+            <select id="type" {...register("type")} className="mt-1 block w-full input-style p-1 text-black">
               <option value="Geral">Geral</option>
               <option value="Consultório">Consultório</option>
               <option value="Emergência">Emergência</option>
@@ -76,7 +76,7 @@ function RoomFormModal({ isOpen, onClose, onSave, roomToEdit, doctors }) {
           </div>
           <div>
             <label htmlFor="doctorId" className="block text-sm font-medium">Médico Principal (Opcional)</label>
-            <select id="doctorId" {...register("doctorId")} className="mt-1 block w-full input-style">
+            <select id="doctorId" {...register("doctorId")} className="mt-1 block w-full input-style p-1 text-black">
               <option value="">Nenhum Médico</option>
               {/* A lista de 'doctors' aqui já virá filtrada do componente pai */}
               {doctors?.map(doc => <option key={doc._id} value={doc._id}>{doc.nome}</option>)}

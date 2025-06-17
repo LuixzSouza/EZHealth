@@ -338,7 +338,7 @@ export default function Chatbot() {
           fixed bottom-6 right-6 w-16 h-16
           bg-[#002157] dark:bg-themeDark dark:border dark:border-white text-white text-3xl 
           rounded-full flex items-center justify-center 
-          shadow-lg hover:bg-[#001f4d] z-[55] overflow-hidden
+          shadow-lg hover:bg-[#001f4d] z-[55] overflow-hidden hover:scale-105
           transition-all duration-300 ease-in-out
           ${isOpen ? 'rotate-45' : 'rotate-0'}
           focus:outline-none focus:ring-2 focus:ring-[#F47127] focus:ring-offset-2

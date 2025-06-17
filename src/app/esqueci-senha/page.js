@@ -9,6 +9,8 @@ import { Header } from '@/components/layout/Header'; // Verifique o caminho corr
 import { Heading } from '@/components/typography/Heading'; // Verifique o caminho correto
 import { ParagraphBlue } from '@/components/theme/ParagraphBlue'; // Verifique o caminho correto
 import { ButtonPrimary } from '@/components/theme/ButtonPrimary'; // Verifique o caminho correto
+import { LockClosedIcon } from '@heroicons/react/24/solid';
+import Link from 'next/link';
 
 export default function EsqueciSenhaPage() {
   const [identifier, setIdentifier] = useState(''); // Pode ser e-mail ou CPF
@@ -75,14 +77,10 @@ export default function EsqueciSenhaPage() {
     <>
       <Header />
 
-      <main className="flex items-center justify-center min-h-[calc(100vh-80px)] bg-gray-50 dark:bg-themeDark p-4">
-        <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 space-y-6 text-center">
-          <Image
-            src="/icons/padlock.svg" // Ícone de cadeado ou segurança
-            width={60}
-            height={60}
-            alt="Esqueci Senha"
-            className="mx-auto mb-4"
+      <main className="flex items-center justify-center min-h-[calc(100vh-80px)] bg-zinc-50 dark:bg-themeDark p-4">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-8 space-y-6 text-center">
+          <LockClosedIcon
+            className="w-16 h-16 mx-auto mb-4 text-DarkBlue dark:text-zinc-500"
           />
           <Heading
             as="h1"
@@ -90,7 +88,7 @@ export default function EsqueciSenhaPage() {
             colorClass="text-DarkBlue dark:text-orangeDark"
             className="text-2xl sm:text-3xl"
           />
-          <ParagraphBlue className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+          <ParagraphBlue className="text-sm sm:text-base text-zinc-600 dark:text-zinc-300">
             Não se preocupe! Informe seu e-mail ou CPF e enviaremos um link para redefinir sua senha.
           </ParagraphBlue>
 
@@ -104,7 +102,7 @@ export default function EsqueciSenhaPage() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="Seu e-mail ou CPF"
-                className="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                className="block w-full px-4 py-3 border border-zinc-300 rounded-md shadow-sm placeholder-zinc-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-zinc-700 dark:border-zinc-600 dark:text-white dark:placeholder-zinc-400"
                 required
                 disabled={loading}
               />
@@ -138,11 +136,11 @@ export default function EsqueciSenhaPage() {
           </form>
 
           <div className="mt-6 text-sm">
-            <ParagraphBlue className="text-gray-600 dark:text-gray-300">
+            <ParagraphBlue className="text-zinc-600 dark:text-zinc-300">
               Lembrou sua senha?{' '}
-              <a href="/login-medico" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+              <Link href="/login-medico" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
                 Fazer Login
-              </a>
+              </Link>
             </ParagraphBlue>
           </div>
         </div>

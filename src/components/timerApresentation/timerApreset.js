@@ -149,8 +149,8 @@ export function TimerApresentacao() {
 
   return (
     <>
-      <div className="fixed top-0 left-0 w-full h-1.5 z-50 pointer-events-none"> 
-        <div ref={progressBarRef} className="h-full bg-orange"></div>
+      <div className="fixed top-0 left-0 w-full h-1 z-[99999] pointer-events-none"> 
+        <div ref={progressBarRef} className="h-full bg-orange dark:bg-orange/40 shadow-sm shadow-white dark:shadow-transparent"></div>
       </div>
 
       <div className="fixed bottom-5 left-1/2 -translate-x-1/2 pointer-events-none">
@@ -169,7 +169,7 @@ export function TimerApresentacao() {
         </div>
       </div>
 
-      <div ref={telaFinalRef} className="fixed inset-0 bg-zinc-900/80 dark:bg-black/80 backdrop-blur-md flex flex-col justify-center items-center z-50 text-white text-center p-6 opacity-0 pointer-events-none">
+      <div ref={telaFinalRef} className="fixed inset-0 bg-zinc-900/80 dark:bg-black/80 backdrop-blur-md flex flex-col justify-center items-center z-[99999] text-white text-center p-6 opacity-0 pointer-events-none">
         {mostrarTelaFinal && <CustomConfetti />}
         <div ref={finalContentRef} className="flex flex-col items-center gap-8 pointer-events-auto transition-transform duration-500">
 

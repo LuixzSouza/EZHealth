@@ -1,13 +1,12 @@
-// src/app/layout.js
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Chatbot from "@/components/ChatBot/Chatbot";
 import VLibras2 from "@/components/Acessibilidade/VLibras";
-import { TimerApresentacao } from "@/components/timerApresentation/timerApreset";
-// import VLibras from 'vlibras-nextjs'
-// REMOVA: import Script from 'next/script'; // Não precisamos mais importar Script aqui diretamente para o Hand Talk
 
-// IMPORTAR O NOVO COMPONENTE CLIENTE
+// --- IMPORTAÇÕES CORRETAS ---
+import { TimerProvider } from "@/context/TimerContext";
+// Importamos o TimerRenderer de seu próprio arquivo, que vamos criar a seguir.
+import { TimerRenderer } from "@/components/timerApresentation/TimerRenderer"; 
 
 const montserrat = Montserrat({
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -26,7 +25,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-br" suppressHydrationWarning>
       <head>
-        {/* Script para tema - Mantenha-o aqui para evitar flash de tema */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -41,16 +39,17 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
-        
       </head>
       <body className={`${montserrat.variable} antialiased`}>
-        {children}
-        <Chatbot/>
-
-        {/* --- Renderiza o HandTalkScript Client Component --- */}
-        {/* Ele mesmo conterá o <Script> e suas lógicas de onLoad/onError */}
-        <VLibras2 /> 
-        <TimerApresentacao/>
+        {/* O Provedor envolve toda a aplicação, isso está correto. */}
+        <TimerProvider>
+          {children}
+          <Chatbot />
+          <VLibras2 />
+          
+          {/* Chamamos o componente importado, que tem sua própria lógica. */}
+          <TimerRenderer />
+        </TimerProvider>
       </body>
     </html>
   );

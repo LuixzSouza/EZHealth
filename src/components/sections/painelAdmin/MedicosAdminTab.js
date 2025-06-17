@@ -116,7 +116,7 @@ function MedicoFormModal({ isOpen, onClose, onSave, medicoToEdit }) {
                 <SafeImage src={previewImage} alt="Preview" width={64} height={64} className="rounded-full object-cover w-16 h-16" />
                 <div className='flex-grow'>
                     <label htmlFor="foto" className="block text-sm font-medium">URL da Foto</label>
-                    <input type="url" id="foto" {...register("foto")} className="mt-1 block w-full input-style" placeholder="https://..."/>
+                    <input type="url" id="foto" {...register("foto")} className="mt-1 block w-full input-style p-1 text-black" placeholder="https://..."/>
                 </div>
             </div>
             <div className="text-center text-sm font-semibold">OU</div>
@@ -129,17 +129,17 @@ function MedicoFormModal({ isOpen, onClose, onSave, medicoToEdit }) {
 
             <div>
                 <label htmlFor="nome" className="block text-sm font-medium">Nome</label>
-                <input type="text" id="nome" {...register("nome", { required: "O nome é obrigatório" })} className="mt-1 block w-full input-style" />
+                <input type="text" id="nome" {...register("nome", { required: "O nome é obrigatório" })} className="mt-1 block w-full input-style p-1 text-black" />
                  {errors.nome && <p className="text-red-500 text-xs mt-1">{errors.nome.message}</p>}
             </div>
             <div>
                 <label htmlFor="especialidade" className="block text-sm font-medium">Especialidade</label>
-                <input type="text" id="especialidade" {...register("especialidade", { required: "A especialidade é obrigatória" })} className="mt-1 block w-full input-style" />
+                <input type="text" id="especialidade" {...register("especialidade", { required: "A especialidade é obrigatória" })} className="mt-1 block w-full input-style p-1 text-black" />
                  {errors.especialidade && <p className="text-red-500 text-xs mt-1">{errors.especialidade.message}</p>}
             </div>
             <div>
                 <label htmlFor="email" className="block text-sm font-medium">Email</label>
-                <input type="email" id="email" {...register("email", { required: "O email é obrigatório", pattern: { value: /^\S+@\S+$/i, message: "Email inválido" }})} className="mt-1 block w-full input-style" />
+                <input type="email" id="email" {...register("email", { required: "O email é obrigatório", pattern: { value: /^\S+@\S+$/i, message: "Email inválido" }})} className="mt-1 block w-full input-style p-1 text-black" />
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
           
@@ -153,14 +153,14 @@ function MedicoFormModal({ isOpen, onClose, onSave, medicoToEdit }) {
                         required: !medicoToEdit ? "A senha é obrigatória" : false, 
                         minLength: !medicoToEdit || watch('password') ? { value: 6, message: "A senha deve ter no mínimo 6 caracteres" } : undefined
                     })} 
-                    className="mt-1 block w-full input-style" 
+                    className="mt-1 block w-full input-style p-1 text-black" 
                 />
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
 
             <div>
                 <label htmlFor="status" className="block text-sm font-medium">Status</label>
-                <select id="status" {...register("status")} className="mt-1 block w-full input-style">
+                <select id="status" {...register("status")} className="mt-1 block w-full input-style p-1 text-black">
                     <option value="Ativo">Ativo</option>
                     <option value="Inativo">Inativo</option>
                     <option value="De Férias">De Férias</option>
