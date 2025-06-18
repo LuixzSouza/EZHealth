@@ -10,7 +10,7 @@ import {
     XCircleIcon // NOVO: Ícone para limpar o campo
 } from "@heroicons/react/24/solid";
 import { CircleOrangeIcon } from "../theme/CircleOrangeIcon";
-import { useSpeechToForm } from "@";
+import { useSpeechToForm } from "@/hooks/useSpeechToForm";
 import { UrgentConfirmationModal } from "./UrgentConfirmationModal";
 
 const urgencias = [
